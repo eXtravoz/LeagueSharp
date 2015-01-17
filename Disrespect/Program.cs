@@ -30,6 +30,9 @@ namespace Disrespect
             Game.OnGameNotifyEvent += Game_OnGameNotifyEvent;
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
 
+            Game.PrintChat("<font color=\"#008B45\">Disrespect - by eXtravoz</font>");
+            Game.PrintChat("Loaded sucefull!");
+
         }
 
         private static void Game_OnGameLoad(EventArgs args)
