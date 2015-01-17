@@ -162,6 +162,16 @@ namespace Disrespect
                     Game.PrintChat("Laughing!");
                     break;
 
+                case GameEventId.OnPlaceWard:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
+
+                case GameEventId.OnKillWard:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
+
                 case GameEventId.OnChampionDoubleKill:
                     Game.Say(laugh);
                     Game.PrintChat("Laughing!");
