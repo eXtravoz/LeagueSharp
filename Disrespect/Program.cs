@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using LeagueSharp.Common;
 using LeagueSharp;
-using LeagueSharp.Common.Damage;
 using LeagueSharp.Network;
 using SharpDX;
 
@@ -20,7 +19,7 @@ namespace Disrespect
         private const string joke = "/joke";
 
         private static Menu _menu;
-        
+
         public static SpellSlot IgniteSlot;
         public static Obj_AI_Hero Player = ObjectManager.Player;
 
@@ -49,7 +48,7 @@ namespace Disrespect
 
         private static void UseIgnite(Obj_AI_Hero unit)
         {
-            var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(unit, Damage.SummonerSpell.Ignite);
+            var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(unit, LeagueSharp.Common.Damage.SummonerSpell.Ignite);
             var targetHealth = unit.Health;
             var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
             if (hasPots || unit.HasBuff("RegenerationPotion", true))
@@ -96,7 +95,7 @@ namespace Disrespect
                         Game.PrintChat("Laughing!");
                         break;
 
-                        case GameEventId.OnTurretDamage:
+                    case GameEventId.OnTurretDamage:
                         Game.Say(taunt);
                         Game.PrintChat("Laughing!");
                         break;
