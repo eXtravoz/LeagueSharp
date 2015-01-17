@@ -30,6 +30,11 @@ namespace Disrespect
 
             switch (args.EventId)
             {
+                
+                case GameEventId.OnDeathAssist:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
 
                 case GameEventId.OnKill:
                     Game.Say(laugh);
