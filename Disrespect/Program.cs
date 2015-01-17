@@ -18,6 +18,8 @@ namespace Disrespect
         private const string laugh = "/laugh";
         private const string taunt = "/taunt";
         private const string joke = "/joke";
+
+        private static Menu _menu;
         
         public static SpellSlot IgniteSlot;
         public static Obj_AI_Hero Player = ObjectManager.Player;
@@ -34,6 +36,10 @@ namespace Disrespect
         {
             IgniteSlot = ObjectManager.Player.GetSpellSlot("SummonerDot");
 
+            _menu = new Menu("Disrespect", "Disrespect", true);
+            _menu.AddItem(new MenuItem("active", "Enabled").SetValue(true));
+            _menu.AddToMainMenu();
+
         }
 
         // BarackObama's kappa
@@ -49,7 +55,6 @@ namespace Disrespect
                 {
                     if (IgniteSlot.IsReady())
                     {
-                        ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
                         Game.Say(laugh);
                         Game.PrintChat("Laughing!");
                     }
@@ -59,7 +64,6 @@ namespace Disrespect
             {
                 if (IgniteSlot.IsReady() && damage > targetHealth)
                 {
-                    ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
                     Game.Say(laugh);
                     Game.PrintChat("Laughing!");
                 }
@@ -74,108 +78,121 @@ namespace Disrespect
                 return;
             }
 
-            switch (args.EventId)
+            if (_menu.Item("active").GetValue<bool>())
             {
+                switch (args.EventId)
+                {
 
-                case GameEventId.OnKillDragonSteal:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnKillDragonSteal:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnDamageGiven:
-                    Game.Say(taunt);
-                    Game.PrintChat("Taunting!");
-                    break;
+                    case GameEventId.OnTurretKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnDamageTaken:
-                    Game.Say(taunt);
-                    Game.PrintChat("Taunting!");
-                    break;
+                        case GameEventId.OnTurretDamage:
+                        Game.Say(taunt);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnMinionKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnDamageGiven:
+                        Game.Say(taunt);
+                        Game.PrintChat("Taunting!");
+                        break;
 
-                case GameEventId.OnFirstBlood:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnDamageTaken:
+                        Game.Say(taunt);
+                        Game.PrintChat("Taunting!");
+                        break;
 
-                case GameEventId.OnSpellLevelup1:
-                    Game.Say(joke);
-                    Game.PrintChat("Joking!");
-                    break;
+                    case GameEventId.OnMinionKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnSpellLevelup2:
-                    Game.Say(joke);
-                    Game.PrintChat("Joking!");
-                    break;
+                    case GameEventId.OnFirstBlood:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnSpellLevelup3:
-                    Game.Say(joke);
-                    Game.PrintChat("Joking!");
-                    break;
+                    case GameEventId.OnSpellLevelup1:
+                        Game.Say(joke);
+                        Game.PrintChat("Joking!");
+                        break;
 
-                case GameEventId.OnSpellLevelup4:
-                    Game.Say(joke);
-                    Game.PrintChat("Joking!");
-                    break;
+                    case GameEventId.OnSpellLevelup2:
+                        Game.Say(joke);
+                        Game.PrintChat("Joking!");
+                        break;
 
-                case GameEventId.OnNexusCrystalStart:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnSpellLevelup3:
+                        Game.Say(joke);
+                        Game.PrintChat("Joking!");
+                        break;
 
-                case GameEventId.OnKillDragon:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnSpellLevelup4:
+                        Game.Say(joke);
+                        Game.PrintChat("Joking!");
+                        break;
 
-                case GameEventId.OnDeathAssist:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnNexusCrystalStart:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnKillDragon:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnChampionPentaKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnDeathAssist:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnChampionQuadraKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnChampionTripleKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnChampionPentaKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnChampionKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnChampionQuadraKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnPlaceWard:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnChampionTripleKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnKillWard:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnChampionKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
 
-                case GameEventId.OnChampionDoubleKill:
-                    Game.Say(laugh);
-                    Game.PrintChat("Laughing!");
-                    break;
+                    case GameEventId.OnPlaceWard:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
+
+                    case GameEventId.OnKillWard:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
+
+                    case GameEventId.OnChampionDoubleKill:
+                        Game.Say(laugh);
+                        Game.PrintChat("Laughing!");
+                        break;
+                }
             }
         }
     }
