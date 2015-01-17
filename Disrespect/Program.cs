@@ -16,6 +16,9 @@ namespace Disrespect
     {
 
         private const string laugh = "/laugh";
+        private const string taunt = "/taunt";
+        private const string joke = "/joke";
+        
         public static SpellSlot IgniteSlot;
         public static Obj_AI_Hero Player = ObjectManager.Player;
 
@@ -74,7 +77,59 @@ namespace Disrespect
             switch (args.EventId)
             {
 
-                case GameEventId.OnSuperMonsterKill:
+                case GameEventId.OnKillDragonSteal:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
+
+                case GameEventId.OnDamageGiven:
+                    Game.Say(taunt);
+                    Game.PrintChat("Taunting!");
+                    break;
+
+                case GameEventId.OnDamageTaken:
+                    Game.Say(taunt);
+                    Game.PrintChat("Taunting!");
+                    break;
+
+                case GameEventId.OnMinionKill:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
+
+                case GameEventId.OnFirstBlood:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
+
+                case GameEventId.OnSpellLevelup1:
+                    Game.Say(joke);
+                    Game.PrintChat("Joking!");
+                    break;
+
+                case GameEventId.OnSpellLevelup2:
+                    Game.Say(joke);
+                    Game.PrintChat("Joking!");
+                    break;
+
+                case GameEventId.OnSpellLevelup3:
+                    Game.Say(joke);
+                    Game.PrintChat("Joking!");
+                    break;
+
+                case GameEventId.OnSpellLevelup4:
+                    Game.Say(joke);
+                    Game.PrintChat("Joking!");
+                    break;
+
+                case GameEventId.OnNexusCrystalStart:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
+                    break;
+
+                case GameEventId.OnKillDragon:
+                    Game.Say(laugh);
+                    Game.PrintChat("Laughing!");
                     break;
 
                 case GameEventId.OnDeathAssist:
