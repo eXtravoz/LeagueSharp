@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using LeagueSharp.Common;
 using LeagueSharp;
+using LeagueSharp.Network;
 using SharpDX;
 
 namespace Disrespect
