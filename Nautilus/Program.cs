@@ -115,7 +115,6 @@ namespace Nautilus
         {
 
             var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-            var jungleKey = _menu.Item("jungleKey").GetValue<KeyBind>().Active;
 
             if (_menu.Item("potOn").GetValue<bool>())
             {
@@ -158,7 +157,7 @@ namespace Nautilus
                 Render.Circle.DrawCircle(position, _e.Range, _e.IsReady() ? Color.Aqua : Color.Red);
             }
 
-            if (drawR)
+            if (drawR &&)
             {
                 Render.Circle.DrawCircle(position, _r.Range, _r.IsReady() ? Color.Aqua : Color.Red);
             }
