@@ -133,7 +133,7 @@ namespace Nautilus
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     Jungle();
-                    break;        
+                    break;
                 default:
                     break;
             }
@@ -157,7 +157,7 @@ namespace Nautilus
                 Render.Circle.DrawCircle(position, _e.Range, _e.IsReady() ? Color.Aqua : Color.Red);
             }
 
-            if (drawR &&)
+            if (drawR)
             {
                 Render.Circle.DrawCircle(position, _r.Range, _r.IsReady() ? Color.Aqua : Color.Red);
             }
