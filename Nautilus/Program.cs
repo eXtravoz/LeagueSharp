@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -66,6 +66,7 @@ namespace Nautilus
 
             // Jouza, thanks :)
             var potionManager = new Menu("potionManager", "Potion Manager");
+            potionManager.AddItem(new MenuItem("potOn", "Enable Auto-Pot").SetValue(true));
             potionManager.AddItem(new MenuItem("hPot", "Health Potion").SetValue(true));
             potionManager.AddItem(new MenuItem("mPot", "Mana Potion").SetValue(true));
             potionManager.AddItem(new MenuItem("hPotPer", "Health Pot %").SetValue(new Slider(35, 1)));
@@ -116,12 +117,12 @@ namespace Nautilus
             var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
             var jungleKey = _menu.Item("jungleKey").GetValue<KeyBind>().Active;
 
-            if (_menu.Item("potionManager").GetValue<bool>())
+            if (_menu.Item("potOn").GetValue<bool>())
             {
                 AutoPot();
             }
 
-            if (_menu.Item("KillSteal").GetValue<bool>())
+            if (_menu.Item("stealOn").GetValue<bool>())
             {
                 Steal(target);
             }
@@ -378,11 +379,3 @@ namespace Nautilus
         }
     }
 }
-
-        
-
-
-            
-
-
-            
