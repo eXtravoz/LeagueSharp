@@ -259,35 +259,39 @@ namespace Nautilus
                 }
             }
 
-            if (_r.IsReady() && RCombo)
-            {
-                Obj_AI_Hero target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                if (target.IsValidTarget(_r.Range))
+                var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
+            
+                if(target != null)
                 {
-                    _r.Cast(target, Packets);
-                }
-            }
+                    if (_r.IsReady() && RCombo)
+                    {
+                        if (ObjectManager.Player.Distance(target) <= _r.Range)
+                        {
+                            _r.Cast(target, Packets);
+                        }
+                    }
 
-            if (_q.IsReady() && QCombo)
-            {
-                Obj_AI_Hero target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
-                if (target.IsValidTarget(_q.Range))
-                {                  
-                    _q.CastIfHitchanceEquals(target, HitChance.High, Packets);
-                }
-            }
+                    if (_q.IsReady() && QCombo)
+                    {
+                        if (ObjectManager.Player.Distance(target) <= _q.Range)
+                        {                  
+                            _q.CastIfHitchanceEquals(target, HitChance.High, Packets);
+                        }
+                    }
 
-            if (_w.IsReady() && WCombo)
-            {
-                _w.Cast(ObjectManager.Player, Packets);
-            }
+                    if (_w.IsReady() && WCombo)
+                    {
+                        if (ObjectManager.Player.Distance(target) <= _w.Range)
+                        {
+                            _w.Cast(ObjectManager.Player, Packets);
+                        }
+                    }
 
-            if (_e.IsReady() && ECombo)
-            {
-                Obj_AI_Hero target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                if (target.IsValidTarget(_e.Range))
-                {
-                    _e.Cast(target, Packets);
+                    if (_e.IsReady() && ECombo)
+                    {
+                        if (ObjectManager.Player.Distance(target) <= _e.Range)
+                        _e.Cast(target, Packets);
+                    }
                 }
             }
         }
