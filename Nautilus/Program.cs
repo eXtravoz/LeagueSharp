@@ -106,6 +106,8 @@ namespace Nautilus
             _config.SubMenu("Drawings").AddItem(new MenuItem("qDraw", "Draw Q").SetValue(true));
             _config.SubMenu("Drawings").AddItem(new MenuItem("eDraw", "Draw E").SetValue(true));
 
+            _config.AddToMainMenu();
+
             Drawing.OnDraw += SharpDraw;
             Game.OnGameUpdate += Updating;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloserOnOnEnemyGapcloser;
