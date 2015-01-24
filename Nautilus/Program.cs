@@ -10,7 +10,7 @@ namespace Nautilus
     internal class Program
     {
 
-        private const string championName = "Thresh";
+        private const string championName = "Nautilus";
 
         private static Orbwalking.Orbwalker Orbwalker;
 
