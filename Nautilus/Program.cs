@@ -3,42 +3,52 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using Color = System.Drawing.Color;
+using System.Collections.Generic;
 
 namespace Nautilus
 {
     internal class Program
     {
 
-        private const string championScript = "Nautilus";
+        private const string championName = "Thresh";
+
+        private static Orbwalking.Orbwalker Orbwalker;
+
+        private static readonly List<Spell> SpellList = new List<Spell>();
 
         private static Spell _q;
         private static Spell _w;
         private static Spell _e;
         private static Spell _r;
 
-        // Thanks to Jouza
+        private static Menu _config;
+
         private static SpellSlot SmiteSlot;
+
         private static Items.Item biscuit = new Items.Item(2010, 10);
+
         private static Items.Item HPpot = new Items.Item(2003, 10);
+
         private static Items.Item Flask = new Items.Item(2041, 10);
 
-        private static Menu _menu;
-        private static Obj_AI_Hero Target;
-        private static Orbwalking.Orbwalker Orbwalker;
-        private static Obj_AI_Hero _player = ObjectManager.Player;
+        private static bool Packets
+        {
+            get { return _config.Item("Packets").GetValue<bool>(); }
+        }
 
         private static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += LoadGame;
-            Drawing.OnDraw += SharpDraw;
-            Game.OnGameUpdate += Updating;
-            Interrupter.OnPossibleToInterrupt += Interrupt;
         }
 
         private static void LoadGame(EventArgs args)
         {
-            if (_player.ChampionName != championScript)
+            if (ObjectManager.Player.ChampionName != championName)
+            {
                 return;
+            }
+
+            SmiteSlot = ObjectManager.Player.GetSpellSlot("summonerdot");
 
             _q = new Spell(SpellSlot.Q, 950f);
             _q.SetSkillshot(0.25f, 90f, 2000f, true, SkillshotType.SkillshotLine);
@@ -47,84 +57,172 @@ namespace Nautilus
             _e = new Spell(SpellSlot.E, 600f);
             _r = new Spell(SpellSlot.R, 825f);
 
-            _menu = new Menu("Nautilus", "Nautilus", true);
-            var thisOrb = new Menu("Orbwalker", "Orbwalker");
-            Orbwalker = new Orbwalking.Orbwalker(thisOrb);
-            _menu.AddSubMenu(thisOrb);
+            SpellList.Add(_q);
+            SpellList.Add(_w);
+            SpellList.Add(_e);
+            SpellList.Add(_r);
 
-            var SimpleTs = new Menu("Target Selector", "TargetSelector");
-            TargetSelector.AddToMenu(SimpleTs);
-            _menu.AddSubMenu(SimpleTs);
+            _config = new Menu(championName, championName, true);
 
-            var comboMenu = new Menu("Combo", "Combo");
-            comboMenu.AddItem(new MenuItem("comboQ", "Use Q")).SetValue(true);
-            comboMenu.AddItem(new MenuItem("comboW", "Use W")).SetValue(true);
-            comboMenu.AddItem(new MenuItem("comboE", "Use E")).SetValue(true);
-            comboMenu.AddItem(new MenuItem("comboR", "Use R")).SetValue(false);
+            var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
+            TargetSelector.AddToMenu(targetSelectorMenu);
+            _config.AddSubMenu(targetSelectorMenu);
 
-            _menu.AddSubMenu(comboMenu);
+            _config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
+            Orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
 
-            // Jouza, thanks :)
-            var potionManager = new Menu("potionManager", "Potion Manager");
-            potionManager.AddItem(new MenuItem("potOn", "Enable Auto-Pot").SetValue(true));
-            potionManager.AddItem(new MenuItem("hPot", "Health Potion").SetValue(true));
-            potionManager.AddItem(new MenuItem("mPot", "Mana Potion").SetValue(true));
-            potionManager.AddItem(new MenuItem("hPotPer", "Health Pot %").SetValue(new Slider(35, 1)));
-            potionManager.AddItem(new MenuItem("mPotPer", "Mana Pot %").SetValue(new Slider(35, 1)));
-            potionManager.AddItem(new MenuItem("ignitePot", "Auto-Pot if ignited").SetValue(true));
+            _config.AddSubMenu(new Menu("Combo", "Combo"));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use E").SetValue(true));
 
+            _config.AddSubMenu(new Menu("Farm", "Farm"));
+            _config.SubMenu("Farm").AddItem(new MenuItem("UseWFarm", "Use W").SetValue(true));
+            _config.SubMenu("Farm").AddItem(new MenuItem("UseEFarm", "Use E").SetValue(true));
 
-            var jungleMenu = new Menu("Jungle", "Jungle");
-            jungleMenu.AddItem(new MenuItem("jungleW", "Use W")).SetValue(true);
-            jungleMenu.AddItem(new MenuItem("jungleE", "Use E")).SetValue(true);
-            _menu.AddSubMenu(jungleMenu);
+            _config.AddSubMenu(new Menu("Killsteal", "Killsteal"));
+            _config.SubMenu("Killsteal").AddItem(new MenuItem("ksOn", "Enable KS").SetValue(true));
+            _config.SubMenu("Killsteal").AddItem(new MenuItem("UseQ", "Use Q").SetValue(true));
+            _config.SubMenu("Killsteal").AddItem(new MenuItem("UseE", "Use E").SetValue(true));
 
-            var drawingMenu = new Menu("Drawing", "Drawing");
-            drawingMenu.AddItem(new MenuItem("qDraw", "Draw Q").SetValue(true));
-            drawingMenu.AddItem(new MenuItem("eDraw", "Draw E").SetValue(false));
-            drawingMenu.AddItem(new MenuItem("rDraw", "Draw R").SetValue(true));
-            _menu.AddSubMenu(drawingMenu);
+            _config.AddSubMenu(new Menu("Misc", "Misc"));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Packets", "Use Packets").SetValue(false));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Interrupts", "Interrupt Q").SetValue(true));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Interruptr", "Interrupt R").SetValue(false));
+            _config.SubMenu("Misc").AddItem(new MenuItem("Gapcloses", "Anti-Gapcloser").SetValue(true));
 
-            var stealMenu = new Menu("KillSteal", "KillSteal");
-            stealMenu.AddItem(new MenuItem("stealOn", "Enable KillSteal")).SetValue(false);
-            stealMenu.AddItem(new MenuItem("stealQ", "Q KillSteal")).SetValue(false);
-            stealMenu.AddItem(new MenuItem("stealE", "E KillSteal")).SetValue(false);
-            stealMenu.AddItem(new MenuItem("stealR", "R KillSteal")).SetValue(false);
-            stealMenu.AddItem(new MenuItem("stealSmite", "Smite KillSteal")).SetValue(false);
-            _menu.AddSubMenu(stealMenu);
+            _config.AddSubMenu(new Menu("AutoPot", "AutoPot"));
+            _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H", "Health Pot").SetValue(true));
+            _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_M", "Mana Pot").SetValue(true));
+            _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H_Per", "Health Pot %").SetValue(new Slider(35, 1)));
+            _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H_Per", "Mana Pot %").SetValue(new Slider(35, 1)));
+            _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_Ign", "Auto pot when ignite").SetValue(true));
 
-            var miscMenu = new Menu("Misc", "Misc");
-            miscMenu.AddItem(new MenuItem("EnemiesE", "X enemies to E")).SetValue(new Slider(1, 0, 5));
-            miscMenu.AddItem(new MenuItem("Packets", "Packet Cast")).SetValue(true);
-            miscMenu.AddItem(new MenuItem("Interrupter", "Interrupt skills")).SetValue(true);
-            miscMenu.AddItem(new MenuItem("Gapcloser", "Use W on Gapcloser")).SetValue(true);
-            miscMenu.AddItem(new MenuItem("EGapcloser", "Use E on Gapcloser")).SetValue(true);
-            _menu.AddSubMenu(miscMenu);
-            _menu.AddToMainMenu();
+            _config.AddSubMenu(new Menu("qMenu", "qMenu"));
+            _config.SubMenu("qMenu").AddItem(new MenuItem("AutoQIm", "Auto Q Immobile").SetValue(true));
+            _config.SubMenu("qMenu").AddItem(new MenuItem("AutoQDash", "Auto Q Dashing").SetValue(true));
 
-            if (SmiteSlot != SpellSlot.Unknown)
+            _config.AddSubMenu(new Menu("Drawings", "Drawings"));
+            _config.SubMenu("Drawings").AddItem(new MenuItem("qDraw", "Draw Q").SetValue(true));
+            _config.SubMenu("Drawings").AddItem(new MenuItem("eDraw", "Draw E").SetValue(true));
+
+            Drawing.OnDraw += SharpDraw;
+            Game.OnGameUpdate += Updating;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloserOnOnEnemyGapcloser;
+            Interrupter.OnPossibleToInterrupt += InterrupterOnOnPossibleToInterrupt;
+            Utility.HpBarDamageIndicator.DamageToUnit = DamageToUnit;
+            Utility.HpBarDamageIndicator.Enabled = true;
+
+            if (SpellSlot.Unknown != SmiteSlot)
             {
-                comboMenu.AddItem(new MenuItem("comboSmite", "Use Smite")).SetValue(true);
+                _config.SubMenu("Combo").AddItem(new MenuItem("UseSmite", "Use Smite").SetValue(true));
             }
 
-            Game.PrintChat("<font color=\"#00BFFF\">Nautilus -</font> <font color=\"#FFFFFF\">Loaded</font>");
+        }
 
+        private static void InterrupterOnOnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        {
+            if (spell.DangerLevel != InterruptableDangerLevel.High)
+            {
+                return;
+            }
+
+            var interrupt = _config.Item("interrupts").GetValue<bool>();
+
+            if (_q.IsReady()& _q.IsInRange(unit, _q.Range) && interrupt)
+            {
+                _q.Cast(unit, Packets);
+            }
+
+            var interruptr = _config.Item("interrupt").GetValue<bool>();
+
+            if (_r.IsReady() && _q.IsInRange(unit, _q.Range) && interruptr)
+            {
+                _r.Cast(unit, Packets);
+            }
+
+            /* if (_w.IsReady())
+            {
+                _
+            }
+            */
+
+        }
+
+        private static void SharpDraw(EventArgs args)
+        {
+            if (!ObjectManager.Player.IsDead)
+            {
+
+                if (_config.Item("qDraw").GetValue<bool>())
+                {
+                    if (_q.Level > 0)
+                    {
+                        Render.Circle.DrawCircle(
+                            ObjectManager.Player.Position, _q.Range, _q.IsReady() ? Color.Aqua : Color.Red);
+                    }
+                }
+
+                if (_config.Item("eDraw").GetValue<bool>())
+                {
+                    if (_e.Level > 0)
+                    {
+                        Render.Circle.DrawCircle(
+                            ObjectManager.Player.Position, _e.Range, _e.IsReady() ? Color.Aqua : Color.Red);
+                    }
+                }
+            }
+        }
+
+        private static void AntiGapcloserOnOnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (gapcloser.Sender.IsValidTarget() && _config.Item("Gapcloses").GetValue<bool>() && _w.IsReady())
+            { 
+                _w.Cast(ObjectManager.Player, Packets);
+            }
+        }
+
+        // Thanks to ChewyMoons
+        private static float DamageToUnit(Obj_AI_Hero hero)
+        {
+            double dmg = 0;
+
+
+            if (_q.IsReady())
+            {
+                dmg += ObjectManager.Player.GetSpellDamage(hero, SpellSlot.Q);
+            }
+
+            if (_w.IsReady())
+            {
+                dmg += ObjectManager.Player.GetSpellDamage(hero, SpellSlot.W);
+            }
+
+            if (_e.IsReady())
+            {
+                dmg += ObjectManager.Player.GetSpellDamage(hero, SpellSlot.E);
+            }
+
+            if (_r.IsReady())
+            {
+                dmg += ObjectManager.Player.GetSpellDamage(hero, SpellSlot.R);
+            }
+
+            if (SmiteSlot != SpellSlot.Unknown &&
+                ObjectManager.Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
+            {
+                dmg += ObjectManager.Player.GetSummonerSpellDamage(hero, Damage.SummonerSpell.Smite);
+            }
+
+            return (float)dmg;
         }
 
         private static void Updating(EventArgs args)
         {
-
-            var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-
-            if (_menu.Item("potOn").GetValue<bool>())
-            {
-                AutoPot();
-            }
-
-            if (_menu.Item("stealOn").GetValue<bool>())
-            {
-                Steal(target);
-            }
+            Immobile();
+            Dashing();
+            KSz();
+            AutoPot();
 
             switch (Orbwalker.ActiveMode)
             {
@@ -132,249 +230,200 @@ namespace Nautilus
                     Combo();
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
-                    Jungle();
+                    LaneClear();
                     break;
                 default:
                     break;
             }
         }
-
-        private static void SharpDraw(EventArgs args)
-        {
-            var drawQ = _menu.Item("qDraw").GetValue<bool>();
-            var drawE = _menu.Item("eDraw").GetValue<bool>();
-            var drawR = _menu.Item("rDraw").GetValue<bool>();
-
-            var position = ObjectManager.Player.Position;
-
-            if (drawQ)
-            {
-                Render.Circle.DrawCircle(position, _q.Range, _q.IsReady() ? Color.Aqua : Color.Red);
-            }
-
-            if (drawE)
-            {
-                Render.Circle.DrawCircle(position, _e.Range, _e.IsReady() ? Color.Aqua : Color.Red);
-            }
-
-            if (drawR)
-            {
-                Render.Circle.DrawCircle(position, _r.Range, _r.IsReady() ? Color.Aqua : Color.Red);
-            }
-        }
-
-        private static void Interrupt(Obj_AI_Base unit, InterruptableSpell spell)
-        {
-
-            if (_menu.Item("Interrupter").GetValue<bool>())
-            {
-                if ((unit.Distance(unit.Position) <= _q.Range) && _q.IsReady())
-                    _q.CastOnUnit(unit, _menu.Item("Packets").GetValue<bool>());
-            }
-        }
-
-        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
-        {
-            if (!_menu.Item("Gapcloser").GetValue<bool>())
-            {
-                if (gapcloser.Sender.IsValidTarget(_w.Range))
-                {
-                    _w.CastOnUnit(_player, _menu.Item("Packets").GetValue<bool>());
-                }
-            }
-
-            if (!_menu.Item("EGapcloser").GetValue<bool>())
-            {
-                if (gapcloser.Sender.IsValidTarget(_e.Range))
-                {
-                    _e.CastOnUnit(_player, _menu.Item("Packets").GetValue<bool>());
-                }
-            }
-
-        }
-
-        private static void Steal(Obj_AI_Hero target)
-        {
-
-            var dmgSmite = _player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Smite);
-            var dmgQ = _player.GetSpellDamage(target, SpellSlot.Q);
-            var dmgE = _player.GetSpellDamage(target, SpellSlot.E);
-            var dmgR = _player.GetSpellDamage(target, SpellSlot.R);
-
-            if (target.IsValidTarget())
-            {
-                if (_menu.Item("stealSmite").GetValue<bool>() &&
-                    _player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
-                {
-                    if (dmgSmite > target.Health && _player.Distance(target) < 600)
-                    {
-                        _player.Spellbook.CastSpell(SmiteSlot, target);
-                    }
-                }
-
-                if (_menu.Item("stealQ").GetValue<bool>())
-                {
-                    if (_q.IsReady())
-                    {
-                        if (dmgQ > target.Health && _player.Distance(target) < 950)
-                        {
-                            _q.Cast(target, _menu.Item("Packets").GetValue<bool>());
-                        }
-                    }
-                }
-
-                if (_menu.Item("stealE").GetValue<bool>())
-                {
-                    if (dmgE > target.Health && _player.Distance(target) < 600)
-                    {
-                        if (_e.IsReady())
-                        {
-                            _e.Cast(target, _menu.Item("Packets").GetValue<bool>());
-                        }
-                    }
-                }
-            }
-        }
-
-        // Jouza's logic WOOOO 
-        private static void AutoPot()
-        {
-            if (_menu.Item("ignitePot").GetValue<bool>())
-                if (_player.HasBuff("summonerdot") || _player.HasBuff("MordekaiserChildrenOfTheGrave"))
-                {
-                    if (!_player.InFountain())
-
-                        if (Items.HasItem(biscuit.Id) && Items.CanUseItem(biscuit.Id) &&
-                            !_player.HasBuff("ItemMiniRegenPotion"))
-                        {
-                            biscuit.Cast(_player);
-                        }
-                        else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) &&
-                                 !_player.HasBuff("RegenerationPotion") && !_player.HasBuff("Health Potion"))
-                        {
-                            HPpot.Cast(_player);
-                        }
-                        else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) &&
-                                 !_player.HasBuff("ItemCrystalFlask"))
-                        {
-                            Flask.Cast(_player);
-                        }
-                }
-
-            if (ObjectManager.Player.HasBuff("Recall") || _player.InFountain() && _player.InShop())
-            {
-                return;
-            }
-
-            if (_menu.Item("hPot").GetValue<bool>())
-            {
-                if (_player.Health / 100 <= _menu.Item("hPotPer").GetValue<Slider>().Value &&
-                    !_player.HasBuff("RegenerationPotion", true))
-                {
-                    Items.UseItem(2003);
-                }
-            }
-
-            if (_menu.Item("mPot").GetValue<bool>())
-            {
-                if (_player.Health / 100 <= _menu.Item("mPotPer").GetValue<Slider>().Value &&
-                    !_player.HasBuff("FlaskOfCrystalWater", true))
-                {
-                    Items.UseItem(2004);
-                }
-            }
-        }
-
         private static void Combo()
         {
-
-            if (TargetSelector.GetSelectedTarget() != null)
-                return;
-
-
-            if (Target.IsValidTarget() && _r.IsReady())
+            var QCombo = _config.Item("UseQCombo").GetValue<bool>();
+            var WCombo = _config.Item("UseWCombo").GetValue<bool>();
+            var ECombo = _config.Item("UseECombo").GetValue<bool>();
+            var RCombo = _config.Item("UseRCombo").GetValue<bool>();
+            var SmiteCombo = _config.Item("UseSmite").GetValue<bool>();
+           
             {
-                if (_menu.Item("comboR").GetValue<bool>())
+                if (SmiteCombo)
                 {
-                    _r.Cast(Target, _menu.Item("Packets").GetValue<bool>());
-                }
-            }
-
-            if (Target.IsValidTarget() && _q.IsReady())
-            {
-                var prediction = _q.GetPrediction(Target);
-
-                if (_menu.Item("comboQ").GetValue<bool>())
-                {
-                    if (prediction.Hitchance >= HitChance.High)
+                    Obj_AI_Hero target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
+                    if (SmiteSlot != SpellSlot.Unknown && ObjectManager.Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
                     {
-                        _q.Cast(Target, _menu.Item("Packets").GetValue<bool>());
+                        ObjectManager.Player.Spellbook.CastSpell(SmiteSlot, target);
+                            return;
                     }
                 }
             }
 
-            if (Target.IsValidTarget() && _w.IsReady())
+            if (_r.IsReady() && RCombo)
             {
-                if (_menu.Item("comboW").GetValue<bool>())
+                Obj_AI_Hero target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
+                if (target.IsValidTarget(_r.Range))
                 {
-                    _w.Cast(_player, _menu.Item("Packets").GetValue<bool>());
+                    _r.Cast(target, Packets);
                 }
             }
 
-            if (Target.IsValidTarget())
+            if (_q.IsReady() && QCombo)
             {
-                if (!_e.IsReady() || _menu.Item("EnemiesE").GetValue<Slider>().Value == 0) return;
-                if (_menu.Item("EnemiesE").GetValue<Slider>().Value == 1)
-                {
-                    var target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
-                    if (!_menu.Item("ult" + target.SkinName).GetValue<bool>()) _e.Cast(target, _menu.Item("packets").GetValue<bool>());
+                Obj_AI_Hero target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
+                if (target.IsValidTarget(_q.Range))
+                {                  
+                    _q.CastIfHitchanceEquals(target, HitChance.High, Packets);
                 }
-                else
+            }
+
+            if (_w.IsReady() && WCombo)
+            {
+                _w.Cast(ObjectManager.Player, Packets);
+            }
+
+            if (_e.IsReady() && ECombo)
+            {
+                Obj_AI_Hero target = TargetSelector.GetTarget(_e.Range, TargetSelector.DamageType.Magical);
+                if (target.IsValidTarget(_e.Range))
                 {
-                    foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(i => i.IsEnemy && !i.IsDead && _player.Distance(i) < _e.Range && _player.Distance(i) > 825f && countChampsAtrange(i, 350f) >= _menu.Item("EnemisE").GetValue<Slider>().Value).OrderByDescending(l => countChampsAtrange(l, 350f)))
-                    {
-                        _e.Cast(enemy, _menu.Item("Packets").GetValue<bool>());
-                        return;
-                    }
+                    _e.Cast(target, Packets);
                 }
             }
         }
 
-        private static void Jungle()
+        private static void LaneClear()
         {
-            // Thanks Jouza again
-            var mobs = MinionManager.GetMinions(_player.ServerPosition, _w.Range, MinionTypes.All,
+            var minions = MinionManager.GetMinions(ObjectManager.Player.Position, _w.Range, MinionTypes.All,
                 MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-            var packets = _menu.Item("Packets").GetValue<bool>();
-            if (mobs.Count <= 0)
+            if (minions.Count <= 0)
             {
                 return;
             }
 
-            var mob = mobs[0];
-            if (mob == null)
+            var minion = minions[0];
+
+            if (minion == null)
             {
                 return;
             }
-            if (_menu.Item("jungleE").GetValue<bool>() && _e.IsReady())
+            if (_config.Item("UseWFarm").GetValue<bool>() && _w.IsReady())
             {
-                _e.CastOnUnit(mob, packets);
+                _w.CastOnUnit(minion, Packets);
             }
-            if (_menu.Item("wJungle").GetValue<bool>() && _w.IsReady())
+            if (_config.Item("UseEFarm").GetValue<bool>() && _e.IsReady())
             {
-                _w.CastOnUnit(mob, packets);
+                _e.CastOnUnit(minion, Packets);
+            }
+
+        }
+
+        /*
+        private static void Should()
+        {
+            if (_config.Item("AutoQCC").GetValue<bool>())
+            {
+                if(_q.GetPrediction())
+            }
+        }
+        */
+
+        private static void Immobile()
+        {
+            if (_config.Item("AutoQIm").GetValue<bool>())
+            {
+                Obj_AI_Hero target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
+                if (target.IsValidTarget(_q.Range))
+                {
+                    _q.CastIfHitchanceEquals(target, HitChance.Immobile, Packets);
+                }
             }
         }
 
-        private static int countChampsAtrange(Obj_AI_Hero l, float p)
+        private static void Dashing()
         {
-            int num = 0;
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(i => !i.IsDead && i.IsEnemy && i.Distance(l) < p))
+            if (_config.Item("AutoQDash").GetValue<bool>())
             {
-                num++;
+                Obj_AI_Hero target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
+                if (target.IsValidTarget(_q.Range))
+                {
+                    _q.CastIfHitchanceEquals(target, HitChance.Dashing, Packets);
+                }
+            }
+        }
+
+        private static void KSz()
+        {
+            if (_config.Item("ksOn").GetValue<bool>())
+            {
+                var target = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Magical);
+                if (target == null)
+                    return;
+
+                var prediction = _q.GetPrediction(target);
+                if (_q.IsReady())
+                {
+                    if (_config.Item("UseQ").GetValue<bool>())
+                    {
+
+                        if (target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q))
+                        {
+                            if (prediction.Hitchance >= HitChance.High &&
+                                prediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 1)
+                            {
+                                _q.Cast(prediction.CastPosition, Packets);
+                            }
+                        }
+                    }
+                }
+
+                if (_e.IsReady())
+                {
+                    if (_config.Item("UseE").GetValue<bool>())
+                    {
+                        if (target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.E))
+                        {
+                           _e.Cast(target, Packets);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void AutoPot()
+        {
+            ///if (_config.Item(""))
+            if (_config.SubMenu("AutoPot").Item("AP_Ign").GetValue<bool>())
+                if (ObjectManager.Player.HasBuff("summonerdot") || ObjectManager.Player.HasBuff("MordekaiserChildrenOfTheGrave"))
+                {
+                    if (!ObjectManager.Player.InFountain())
+
+                        if (Items.HasItem(biscuit.Id) && Items.CanUseItem(biscuit.Id) && !ObjectManager.Player.HasBuff("ItemMiniRegenPotion"))
+                        {
+                            biscuit.Cast(ObjectManager.Player);
+                        }
+                        else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) && !ObjectManager.Player.HasBuff("RegenerationPotion") && !ObjectManager.Player.HasBuff("Health Potion"))
+                        {
+                            HPpot.Cast(ObjectManager.Player);
+                        }
+                        else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) && !ObjectManager.Player.HasBuff("ItemCrystalFlask"))
+                        {
+                            Flask.Cast(ObjectManager.Player);
+                        }
+                }
+
+            if (ObjectManager.Player.HasBuff("Recall") || ObjectManager.Player.InFountain() && ObjectManager.Player.InShop())
+            {
+                return;
             }
 
-            return num;
+            //Health Pots
+            if (ObjectManager.Player.Health / 100 <= _config.Item("AP_H_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("RegenerationPotion", true))
+            {
+                Items.UseItem(2003);
+            }
+            //Mana Pots
+            if (ObjectManager.Player.Health / 100 <= _config.Item("A_M_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
+            {
+                Items.UseItem(2004);
+            }
         }
     }
 }
