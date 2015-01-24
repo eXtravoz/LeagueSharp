@@ -92,6 +92,7 @@ namespace Nautilus
             _config.SubMenu("Misc").AddItem(new MenuItem("Gapcloses", "Anti-Gapcloser").SetValue(true));
 
             _config.AddSubMenu(new Menu("AutoPot", "AutoPot"));
+            _config.SubMenu("AutoPot").AddItem(new MenuItem("apOn", "Enable Auto-Pot").SetValue(true));
             _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H", "Health Pot").SetValue(true));
             _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_M", "Mana Pot").SetValue(true));
             _config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H_Per", "Health Pot %").SetValue(new Slider(35, 1)));
@@ -391,40 +392,42 @@ namespace Nautilus
 
         private static void AutoPot()
         {
-            ///if (_config.Item(""))
-            if (_config.SubMenu("AutoPot").Item("AP_Ign").GetValue<bool>())
-                if (ObjectManager.Player.HasBuff("summonerdot") || ObjectManager.Player.HasBuff("MordekaiserChildrenOfTheGrave"))
-                {
-                    if (!ObjectManager.Player.InFountain())
+            if (_config.Item("apOn").GetValue<bool>())
+            {
+                if (_config.SubMenu("AutoPot").Item("AP_Ign").GetValue<bool>())
+                    if (ObjectManager.Player.HasBuff("summonerdot") || ObjectManager.Player.HasBuff("MordekaiserChildrenOfTheGrave"))
+                    {
+                        if (!ObjectManager.Player.InFountain())
 
-                        if (Items.HasItem(biscuit.Id) && Items.CanUseItem(biscuit.Id) && !ObjectManager.Player.HasBuff("ItemMiniRegenPotion"))
-                        {
-                            biscuit.Cast(ObjectManager.Player);
+                            if (Items.HasItem(biscuit.Id) && Items.CanUseItem(biscuit.Id) && !ObjectManager.Player.HasBuff("ItemMiniRegenPotion"))
+                            {
+                                biscuit.Cast(ObjectManager.Player);
+                            }
+                            else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) && !ObjectManager.Player.HasBuff("RegenerationPotion") && !ObjectManager.Player.HasBuff("Health Potion"))
+                            {
+                                HPpot.Cast(ObjectManager.Player);
+                            }
+                            else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) && !ObjectManager.Player.HasBuff("ItemCrystalFlask"))
+                            {
+                                Flask.Cast(ObjectManager.Player);
                         }
-                        else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) && !ObjectManager.Player.HasBuff("RegenerationPotion") && !ObjectManager.Player.HasBuff("Health Potion"))
-                        {
-                            HPpot.Cast(ObjectManager.Player);
-                        }
-                        else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) && !ObjectManager.Player.HasBuff("ItemCrystalFlask"))
-                        {
-                            Flask.Cast(ObjectManager.Player);
-                        }
+                    }
+
+                if (ObjectManager.Player.HasBuff("Recall") || ObjectManager.Player.InFountain() && ObjectManager.Player.InShop())
+                {
+                    return;
                 }
 
-            if (ObjectManager.Player.HasBuff("Recall") || ObjectManager.Player.InFountain() && ObjectManager.Player.InShop())
-            {
-                return;
-            }
-
-            //Health Pots
-            if (ObjectManager.Player.Health / 100 <= _config.Item("AP_H_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("RegenerationPotion", true))
-            {
-                Items.UseItem(2003);
-            }
-            //Mana Pots
-            if (ObjectManager.Player.Health / 100 <= _config.Item("A_M_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
-            {
-                Items.UseItem(2004);
+                //Health Pots
+                if (ObjectManager.Player.Health / 100 <= _config.Item("AP_H_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("RegenerationPotion", true))
+                {
+                    Items.UseItem(2003);
+                }
+                //Mana Pots
+                if (ObjectManager.Player.Health / 100 <= _config.Item("A_M_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
+                {
+                    Items.UseItem(2004);
+                }
             }
         }
     }
