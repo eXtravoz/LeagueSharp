@@ -74,8 +74,9 @@ namespace Nautilus
             _config.AddSubMenu(new Menu("Combo", "Combo"));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
             _config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
-            _config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use E").SetValue(true));
-
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
+            _config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
+            
             _config.AddSubMenu(new Menu("Farm", "Farm"));
             _config.SubMenu("Farm").AddItem(new MenuItem("UseWFarm", "Use W").SetValue(true));
             _config.SubMenu("Farm").AddItem(new MenuItem("UseEFarm", "Use E").SetValue(true));
@@ -241,7 +242,7 @@ namespace Nautilus
 
             if (targets.IsValidTarget())
             {
-                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= -_r.Range && _config.Item("UseQCombo").GetValue<bool>())
+                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= _r.Range && _config.Item("UseRCombo").GetValue<bool>())
                 {
                     _r.Cast(targets, Packets);
                 }
