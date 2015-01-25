@@ -241,7 +241,7 @@ namespace Nautilus
 
             if (targets.IsValidTarget())
             {
-                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= -_r.Range && _config.Item("UseQCombo").GetValue<bool>())
+                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= _r.Range && _config.Item("UseQCombo").GetValue<bool>())
                 {
                     _r.Cast(targets, Packets);
                 }
@@ -262,7 +262,7 @@ namespace Nautilus
 
                 if (_e.IsReady() && ObjectManager.Player.Distance(targets) <= _e.Range && _config.Item("UseECombo").GetValue<bool>())
                 {
-                    _e.Cast(targets, Packets);
+                    _e.Cast(ObjectManager.Player, Packets);
                 }
             }
         }
