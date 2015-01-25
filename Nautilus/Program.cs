@@ -116,11 +116,6 @@ namespace Nautilus
             Utility.HpBarDamageIndicator.DamageToUnit = DamageToUnit;
             Utility.HpBarDamageIndicator.Enabled = true;
 
-            if (SpellSlot.Unknown != SmiteSlot)
-            {
-                _config.SubMenu("Combo").AddItem(new MenuItem("UseSmite", "Use Smite").SetValue(true));
-            }
-
         }
 
         private static void InterrupterOnOnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
@@ -239,59 +234,35 @@ namespace Nautilus
                     break;
             }
         }
+
         private static void Combo()
         {
-            var QCombo = _config.Item("UseQCombo").GetValue<bool>();
-            var WCombo = _config.Item("UseWCombo").GetValue<bool>();
-            var ECombo = _config.Item("UseECombo").GetValue<bool>();
-            var RCombo = _config.Item("UseRCombo").GetValue<bool>();
-            var SmiteCombo = _config.Item("UseSmite").GetValue<bool>();
-           
+            var targets = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
+
+            if (targets.IsValidTarget())
             {
-                if (SmiteCombo)
+                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= -_r.Range && _config.Item("UseQCombo").GetValue<bool>())
                 {
-                    Obj_AI_Hero target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-                    if (SmiteSlot != SpellSlot.Unknown && ObjectManager.Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
+                    _r.Cast(targets, Packets);
+                }
+
+                if (_q.IsReady() && ObjectManager.Player.Distance(targets) <= _q.Range && _config.Item("UseQCombo").GetValue<bool>())
+                {
+                    var qPred = _q.GetPrediction(targets);
+                    if (qPred.Hitchance >= HitChance.High)
                     {
-                        ObjectManager.Player.Spellbook.CastSpell(SmiteSlot, target);
-                            return;
+                        _q.Cast(qPred.CastPosition);
                     }
                 }
-            }
 
-                var target = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-            
-                if(target != null)
+                if (_w.IsReady() && _config.Item("UseWCombo").GetValue<bool>())
                 {
-                    if (_r.IsReady() && RCombo)
-                    {
-                        if (ObjectManager.Player.Distance(target) <= _r.Range)
-                        {
-                            _r.Cast(target, Packets);
-                        }
-                    }
+                    _w.Cast(ObjectManager.Player, Packets);
+                }
 
-                    if (_q.IsReady() && QCombo)
-                    {
-                        if (ObjectManager.Player.Distance(target) <= _q.Range)
-                        {                  
-                            _q.CastIfHitchanceEquals(target, HitChance.High, Packets);
-                        }
-                    }
-
-                    if (_w.IsReady() && WCombo)
-                    {
-                        if (ObjectManager.Player.Distance(target) <= _w.Range)
-                        {
-                            _w.Cast(ObjectManager.Player, Packets);
-                        }
-                    }
-
-                    if (_e.IsReady() && ECombo)
-                    {
-                        if (ObjectManager.Player.Distance(target) <= _e.Range)
-                        _e.Cast(target, Packets);
-                    }
+                if (_e.IsReady() && ObjectManager.Player.Distance(targets) <= _e.Range && _config.Item("UseECombo").GetValue<bool>())
+                {
+                    _e.Cast(targets, Packets);
                 }
             }
         }
@@ -399,36 +370,45 @@ namespace Nautilus
             if (_config.Item("apOn").GetValue<bool>())
             {
                 if (_config.SubMenu("AutoPot").Item("AP_Ign").GetValue<bool>())
-                    if (ObjectManager.Player.HasBuff("summonerdot") || ObjectManager.Player.HasBuff("MordekaiserChildrenOfTheGrave"))
+                    if (ObjectManager.Player.HasBuff("summonerdot") ||
+                        ObjectManager.Player.HasBuff("MordekaiserChildrenOfTheGrave"))
                     {
                         if (!ObjectManager.Player.InFountain())
 
-                            if (Items.HasItem(biscuit.Id) && Items.CanUseItem(biscuit.Id) && !ObjectManager.Player.HasBuff("ItemMiniRegenPotion"))
+                            if (Items.HasItem(biscuit.Id) && Items.CanUseItem(biscuit.Id) &&
+                                !ObjectManager.Player.HasBuff("ItemMiniRegenPotion"))
                             {
                                 biscuit.Cast(ObjectManager.Player);
                             }
-                            else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) && !ObjectManager.Player.HasBuff("RegenerationPotion") && !ObjectManager.Player.HasBuff("Health Potion"))
+                            else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) &&
+                                     !ObjectManager.Player.HasBuff("RegenerationPotion") &&
+                                     !ObjectManager.Player.HasBuff("Health Potion"))
                             {
                                 HPpot.Cast(ObjectManager.Player);
                             }
-                            else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) && !ObjectManager.Player.HasBuff("ItemCrystalFlask"))
+                            else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) &&
+                                     !ObjectManager.Player.HasBuff("ItemCrystalFlask"))
                             {
                                 Flask.Cast(ObjectManager.Player);
-                        }
+                            }
                     }
 
-                if (ObjectManager.Player.HasBuff("Recall") || ObjectManager.Player.InFountain() && ObjectManager.Player.InShop())
+
+                if (ObjectManager.Player.HasBuff("Recall") ||
+                    ObjectManager.Player.InFountain() && ObjectManager.Player.InShop())
                 {
                     return;
                 }
 
                 //Health Pots
-                if (ObjectManager.Player.Health / 100 <= _config.Item("AP_H_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("RegenerationPotion", true))
+                if (ObjectManager.Player.Health / 100 <= _config.Item("AP_H_Per").GetValue<Slider>().Value &&
+                    !ObjectManager.Player.HasBuff("RegenerationPotion", true))
                 {
                     Items.UseItem(2003);
                 }
                 //Mana Pots
-                if (ObjectManager.Player.Health / 100 <= _config.Item("A_M_Per").GetValue<Slider>().Value && !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
+                if (ObjectManager.Player.Health / 100 <= _config.Item("A_M_Per").GetValue<Slider>().Value &&
+                    !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
                 {
                     Items.UseItem(2004);
                 }
