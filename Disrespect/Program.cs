@@ -49,7 +49,6 @@ namespace Disrespect
         {
             var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(unit, LeagueSharp.Common.Damage.SummonerSpell.Ignite);
             var targetHealth = unit.Health;
-            var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
             if (hasPots || unit.HasBuff("RegenerationPotion", true))
             {
                 if (damage * 0.5 > targetHealth)
