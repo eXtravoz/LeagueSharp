@@ -226,45 +226,16 @@ namespace Nautilus
             switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
-                    Combo();
+                    Ancora();
+                    Escudo();
+                    Profundeza();
+                    JogarPraCima();
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     LaneClear();
                     break;
                 default:
                     break;
-            }
-        }
-
-        private static void Combo()
-        {
-            var targets = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
-
-            if (targets.IsValidTarget())
-            {
-                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= _r.Range && _config.Item("UseRCombo").GetValue<bool>())
-                {
-                    _r.Cast(targets, Packets);
-                }
-
-                if (_q.IsReady() && ObjectManager.Player.Distance(targets) <= _q.Range && _config.Item("UseQCombo").GetValue<bool>())
-                {
-                    var qPred = _q.GetPrediction(targets);
-                    if (qPred.Hitchance >= HitChance.High)
-                    {
-                        _q.Cast(qPred.CastPosition);
-                    }
-                }
-
-                if (_w.IsReady() && _config.Item("UseWCombo").GetValue<bool>())
-                {
-                    _w.Cast(ObjectManager.Player, Packets);
-                }
-
-                if (_e.IsReady() && ObjectManager.Player.Distance(targets) <= _e.Range && _config.Item("UseECombo").GetValue<bool>())
-                {
-                    _e.Cast(ObjectManager.Player, Packets);
-                }
             }
         }
 
@@ -303,6 +274,50 @@ namespace Nautilus
             }
         }
         */
+        var targets = TargetSelector.GetTarget(_r.Range, TargetSelector.DamageType.Magical);
+        
+        private static void JogarPraCima()
+        {
+            if (target == null)
+            {
+                if (_r.IsReady() && ObjectManager.Player.Distance(targets) <= _r.Range && _config.Item("UseRCombo").GetValue<bool>())
+                {
+                    _r.Cast(targets, Packets);
+                }
+            }
+            
+        }
+        
+        private static void Ancora()
+        {
+            if (target == null)
+            {
+                if (_q.IsReady() && ObjectManager.Player.Distance(targets) <= _q.Range && _config.Item("UseQCombo").GetValue<bool>())
+                {
+                    var qPred = _q.GetPrediction(targets);
+                    if (qPred.Hitchance >= HitChance.High)
+                    {
+                        _q.Cast(qPred.CastPosition);
+                    }
+                }
+            }
+        }
+        
+        private static void Escudo()
+        {
+            if (_w.IsReady() && _config.Item("UseWCombo").GetValue<bool>())
+            {
+                 _w.Cast(ObjectManager.Player, Packets);
+            }
+        }
+        
+        private static void Profundeza()
+        {
+            if (_e.IsReady() && ObjectManager.Player.Distance(targets) <= _e.Range && _config.Item("UseECombo").GetValue<bool>())
+            {
+                _e.Cast(targets, Packets);
+            }
+        }
 
         private static void Immobile()
         {
