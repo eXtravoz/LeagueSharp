@@ -10,7 +10,6 @@ using SharpDX;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
-
 using Color = System.Drawing.Color;
 
 namespace XinZhao
@@ -24,7 +23,7 @@ namespace XinZhao
 
         private readonly Dictionary<SpellSlot, Spell> _spells = new Dictionary<SpellSlot, Spell>
         {
-            {SpellSlot.Q, new Spell(SpellSlot.Q, 0)},
+                {SpellSlot.Q, new Spell(SpellSlot.Q, 0)},
 	        {SpellSlot.W, new Spell(SpellSlot.W, 0)},
 	        {SpellSlot.E, new Spell(SpellSlot.E, 650)},
 	        {SpellSlot.R, new Spell(SpellSlot.R, 500)}
