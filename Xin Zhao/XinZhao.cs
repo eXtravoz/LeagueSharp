@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -10,6 +10,7 @@ using SharpDX;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
+
 using Color = System.Drawing.Color;
 
 namespace XinZhao
@@ -21,9 +22,11 @@ namespace XinZhao
         public static Orbwalking.Orbwalker Orbwalker;
         public static Menu Config;
 
+        public static SpellSlot IgniteSlot;
+
         private readonly Dictionary<SpellSlot, Spell> _spells = new Dictionary<SpellSlot, Spell>
         {
-                {SpellSlot.Q, new Spell(SpellSlot.Q, 0)},
+            {SpellSlot.Q, new Spell(SpellSlot.Q, 0)},
 	        {SpellSlot.W, new Spell(SpellSlot.W, 0)},
 	        {SpellSlot.E, new Spell(SpellSlot.E, 650)},
 	        {SpellSlot.R, new Spell(SpellSlot.R, 500)}
@@ -41,6 +44,8 @@ namespace XinZhao
                 return;
             }
 
+            IgniteSlot = ObjectManager.Player.GetSpellSlot("SummonerDot"); 
+
             Config = new Menu("Xin Zhao", "XinZhao", true);
 
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
@@ -54,6 +59,7 @@ namespace XinZhao
             c.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
             c.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
             c.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
+            c.SubMenu("Combo").AddItem(new MenuItem("igniteCombo", "Use Ignite if Killable").SetValue(true));
             c.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(Config.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             var f = Config.AddSubMenu(new Menu("Farm", "Farm"));
@@ -138,7 +144,9 @@ namespace XinZhao
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-
+            var igniteT = TargetSelector.GetTarget(600f, TargetSelector.DamageType.Physical);
+            if (Config.Item("igniteCombo").GetValue<bool>())
+                UseIgnite(igniteT);
             if (Config.Item("stealActive").GetValue<bool>())
                 KillSteal();
             if (Config.Item("ComboActive").GetValue<KeyBind>().Active)
@@ -302,6 +310,30 @@ namespace XinZhao
                     {
                         _spells[SpellSlot.E].Cast();
                     }
+                }
+            }
+        }
+
+        private static void UseIgnite(Obj_AI_Hero unit)
+        {
+            var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(unit, Damage.SummonerSpell.Ignite);
+            var targetHealth = unit.Health;
+            var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
+            if (hasPots || unit.HasBuff("RegenerationPotion", true))
+            {
+                if (damage * 0.5 > targetHealth)
+                {
+                    if (IgniteSlot.IsReady())
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
+                    }
+                }
+            }
+            else
+            {
+                if (IgniteSlot.IsReady() && damage > targetHealth)
+                {
+                    ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
                 }
             }
         }
