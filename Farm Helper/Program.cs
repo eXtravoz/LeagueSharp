@@ -44,6 +44,11 @@ namespace FarmHelper
                     Game.PrintChat("<font color='0088FF'>FarmHelper: </font>" + ObjectManager.Player.ChampionName + " " + "<font color='0088FF'>Loaded!</font>");
                     break;
 
+                case "LeBlanc":
+                    new LeBlanc();
+                    Game.PrintChat("<font color='0088FF'>FarmHelper: </font>" + ObjectManager.Player.ChampionName + " " + "<font color='0088FF'>Loaded!</font>");
+                    break;
+
                 default:
                     Game.PrintChat("<font color='0088FF'>FarmHelper: </font>" + ObjectManager.Player.ChampionName + " " + "<font color='FF0000'>Not Supported!</font>");
                     break;

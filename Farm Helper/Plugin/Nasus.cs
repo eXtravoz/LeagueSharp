@@ -42,18 +42,12 @@ namespace FarmHelper.Plugin
 
         private void FMQMinion()
         {
-            foreach (
-                    var minion in
-                        ObjectManager.Get<Obj_AI_Minion>()
-                            .Where(minion => minion.Team != ObjectManager.Player.Team)
-                    )
+            if (_config.Item("fmEnableQ").GetValue<bool>())
             {
-                if (minion.Health < _spells[SpellSlot.Q].GetDamage(minion) && _spells[SpellSlot.Q].IsReady() && minion.IsValidTarget(_spells[SpellSlot.Q].Range))
+                var kMinion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _spells[SpellSlot.Q].Range).Find(m => _spells[SpellSlot.Q].IsKillable(m));
+                if (kMinion.IsValidTarget(_spells[SpellSlot.Q].Range))
                 {
-                    if (_config.Item("fmEnableQ").GetValue<bool>())
-                    {
-                        _spells[SpellSlot.Q].Cast(minion);
-                    }
+                    _spells[SpellSlot.Q].Cast();
                 }
             }
 
