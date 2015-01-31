@@ -54,10 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Plugin\Akali.cs" />
     <Compile Include="Plugin\Annie.cs" />
     <Compile Include="Plugin\Gangplank.cs" />
     <Compile Include="Plugin\LeBlanc.cs" />
     <Compile Include="Plugin\Nasus.cs" />
+    <Compile Include="Plugin\Ryze.cs" />
     <Compile Include="Plugin\Veigar.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

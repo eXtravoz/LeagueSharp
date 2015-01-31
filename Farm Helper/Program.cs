@@ -13,7 +13,7 @@ namespace FarmHelper
 {
     class Program
     {
-        private static Obj_AI_Hero Player;
+        private static Obj_AI_Hero Player;       
 
         static void Main(string[] args)
         {
@@ -46,6 +46,16 @@ namespace FarmHelper
 
                 case "LeBlanc":
                     new LeBlanc();
+                    Game.PrintChat("<font color='0088FF'>FarmHelper: </font>" + ObjectManager.Player.ChampionName + " " + "<font color='0088FF'>Loaded!</font>");
+                    break;
+
+                case "Akali":
+                    new Akali();
+                    Game.PrintChat("<font color='0088FF'>FarmHelper: </font>" + ObjectManager.Player.ChampionName + " " + "<font color='0088FF'>Loaded!</font>");
+                    break;
+
+                case "Ryze":
+                    new Ryze();
                     Game.PrintChat("<font color='0088FF'>FarmHelper: </font>" + ObjectManager.Player.ChampionName + " " + "<font color='0088FF'>Loaded!</font>");
                     break;
 
