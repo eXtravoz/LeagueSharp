@@ -1,3 +1,5 @@
+/*
+
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,7 +117,7 @@ namespace JungleAIO.Champions
             }
         }
          */
-
+        /*
         private void JungleAIO_OnOnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (Config.Item("WGapCloser").GetValue<bool>())
@@ -287,3 +289,4 @@ namespace JungleAIO.Champions
         }
     }
 }
+/*
