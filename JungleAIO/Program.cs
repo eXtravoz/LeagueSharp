@@ -42,6 +42,12 @@ namespace JungleAIO
                     Game.PrintChat("Loaded - [JungleAIO]");
                     Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
                     break;
+
+                case "Nautilus":
+                    new Nautilus();
+                    Game.PrintChat("Loaded - [JungleAIO]");
+                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
+                    break;
                     
                     default:
                     Game.PrintChat("[JungleAIO] - Champion Not Supported!");
