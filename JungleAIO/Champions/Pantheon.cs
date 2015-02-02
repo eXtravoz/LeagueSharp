@@ -1,3 +1,5 @@
+/*
+
 #region
 
 using System;
@@ -132,6 +134,7 @@ namespace JungleAIO.Champions
                     new MenuItem("RDraw", "Draw R Range").SetValue(new Circle(true, Color.FromArgb(255, 255, 255, 255))));*/
 
             //Misc Menu
+            /*
             Config.AddSubMenu(new Menu("Misc Settings", "misc"));
             Config.SubMenu("misc").AddItem(new MenuItem("stopChannel", "Interrupt Spells").SetValue(true));
             Config.SubMenu("misc").AddItem(new MenuItem("gapcloser", "Interrupt Gapclosers").SetValue(true));
@@ -275,16 +278,16 @@ namespace JungleAIO.Champions
             if (Q.IsReady())
             {
                 foreach (var kstarget in from kstarget in target
-                    let actualHp =
-                        (HealthPrediction.GetHealthPrediction(kstarget, (int) (Player.Distance(kstarget) * 1000 / 1500)) <=
-                         kstarget.MaxHealth * 0.15)
-                            ? Player.GetSpellDamage(kstarget, SpellSlot.Q) * 2
-                            : Player.GetSpellDamage(kstarget, SpellSlot.Q)
-                    where
-                        kstarget.IsValidTarget() &&
-                        HealthPrediction.GetHealthPrediction(kstarget, (int) (Player.Distance(kstarget) * 1000 / 1500)) <=
-                        actualHp
-                    select kstarget)
+                                         let actualHp =
+                                             (HealthPrediction.GetHealthPrediction(kstarget, (int)(Player.Distance(kstarget) * 1000 / 1500)) <=
+                                              kstarget.MaxHealth * 0.15)
+                                                 ? Player.GetSpellDamage(kstarget, SpellSlot.Q) * 2
+                                                 : Player.GetSpellDamage(kstarget, SpellSlot.Q)
+                                         where
+                                             kstarget.IsValidTarget() &&
+                                             HealthPrediction.GetHealthPrediction(kstarget, (int)(Player.Distance(kstarget) * 1000 / 1500)) <=
+                                             actualHp
+                                         select kstarget)
                 {
                     Q.CastOnUnit(kstarget, PacketCast);
                     return;
@@ -295,12 +298,12 @@ namespace JungleAIO.Champions
                 ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
             {
                 foreach (var kstarget in from kstarget in target
-                    where
-                        kstarget.IsValidTarget() &&
-                        kstarget.Health <=
-                        ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) &&
-                        ObjectManager.Player.Distance(kstarget) < 600
-                    select kstarget)
+                                         where
+                                             kstarget.IsValidTarget() &&
+                                             kstarget.Health <=
+                                             ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) &&
+                                             ObjectManager.Player.Distance(kstarget) < 600
+                                         select kstarget)
                 {
                     ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, kstarget);
                 }
@@ -504,16 +507,16 @@ namespace JungleAIO.Champions
             if (Config.Item("qFarm").GetValue<bool>() && Q.IsReady())
             {
                 foreach (var minion in from minion in minions
-                    let actualHp =
-                        (HealthPrediction.GetHealthPrediction(minion, (int) (Player.Distance(minion) * 1000 / 1500)) <=
-                         minion.MaxHealth * 0.15)
-                            ? Player.GetSpellDamage(minion, SpellSlot.Q) * 2
-                            : Player.GetSpellDamage(minion, SpellSlot.Q)
-                    where
-                        minion.IsValidTarget() &&
-                        HealthPrediction.GetHealthPrediction(minion, (int) (Player.Distance(minion) * 1000 / 1500)) <=
-                        actualHp
-                    select minion)
+                                       let actualHp =
+                                           (HealthPrediction.GetHealthPrediction(minion, (int)(Player.Distance(minion) * 1000 / 1500)) <=
+                                            minion.MaxHealth * 0.15)
+                                               ? Player.GetSpellDamage(minion, SpellSlot.Q) * 2
+                                               : Player.GetSpellDamage(minion, SpellSlot.Q)
+                                       where
+                                           minion.IsValidTarget() &&
+                                           HealthPrediction.GetHealthPrediction(minion, (int)(Player.Distance(minion) * 1000 / 1500)) <=
+                                           actualHp
+                                       select minion)
                 {
                     Q.CastOnUnit(minion, PacketCast);
                     return;
@@ -526,7 +529,7 @@ namespace JungleAIO.Champions
                     minions.Where(
                         minion =>
                             minion != null && minion.IsValidTarget(E.Range) &&
-                            HealthPrediction.GetHealthPrediction(minion, (int) (Player.Distance(minion))) <
+                            HealthPrediction.GetHealthPrediction(minion, (int)(Player.Distance(minion))) <
                             Player.GetSpellDamage(minion, SpellSlot.E)))
                 {
                     E.CastOnUnit(minion, PacketCast);
@@ -598,7 +601,7 @@ namespace JungleAIO.Champions
                 dmg += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Smite);
             }
 
-            return (float) dmg;
+            return (float)dmg;
         }
 
         //Items using 
@@ -663,3 +666,4 @@ namespace JungleAIO.Champions
         }
     }
 }
+*/
