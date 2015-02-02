@@ -1,5 +1,3 @@
-/*
-
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,29 +16,46 @@ namespace JungleAIO.Champions
     {
 
         public static Orbwalking.Orbwalker Orbwalker;
+        public static List<Spell> Spells = new List<Spell>();
+        public static Spell Q;
+        public static Spell W;
+        public static Spell E;
+        public static Spell R;
+        public static SpellSlot IgniteSlot;
+        public static SpellSlot SmiteSlot;
         public static Menu Config;
+        public static Obj_AI_Hero Player = ObjectManager.Player;
+        public static bool PacketCast;
 
-        private static SpellSlot IgniteSlot;
-        private static SpellSlot SmiteSlot;
-
-        private readonly Dictionary<SpellSlot, Spell> _spells = new Dictionary<SpellSlot, Spell>
-        {
-
-	        {SpellSlot.Q, new Spell(SpellSlot.Q, 950)},
-	        {SpellSlot.W, new Spell(SpellSlot.W, 0)},
-	        {SpellSlot.E, new Spell(SpellSlot.E, 600)},
-	        {SpellSlot.R, new Spell(SpellSlot.R, 825)}
-
-        };
+        // Items
+        public static Items.Item Biscuit = new Items.Item(2010, 10);
+        public static Items.Item HPpot = new Items.Item(2003, 10);
+        public static Items.Item Flask = new Items.Item(2041, 10);
 
         public Nautilus()
         {
-            _spells[SpellSlot.Q].SetSkillshot(0.25f, 90f, 2000f, true, SkillshotType.SkillshotLine);
-            CustomEvents.Game.OnGameLoad += JungleAIO_Load; 
+            Q.SetSkillshot(0.25f, 90f, 2000f, true, SkillshotType.SkillshotLine);
+            CustomEvents.Game.OnGameLoad += JungleAIO_Load;
         }
 
         private void JungleAIO_Load(EventArgs args)
         {
+
+            Q = new Spell(SpellSlot.Q, 1125);
+            Q.SetSkillshot(0.25f, 60f, 1600f, false, SkillshotType.SkillshotLine);
+
+            W = new Spell(SpellSlot.W, 0);
+            E = new Spell(SpellSlot.E, 425);
+            E.SetTargetted(0.5f, 1700f);
+
+            R = new Spell(SpellSlot.R, 2000);
+            R.SetTargetted(0.75f, 2500f);
+
+            Spells.Add(Q);
+            Spells.Add(W);
+            Spells.Add(E);
+            Spells.Add(R);
+
             SmiteSlot = ObjectManager.Player.GetSpellSlot("summonerdot");
 
             Config = new Menu("JungleAIO: Nautilus", "Nautilus", true);
@@ -57,7 +72,7 @@ namespace JungleAIO.Champions
             Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(Config.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
+            Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind("K".ToCharArray()[0], KeyBindType.Press)));
 
             Config.AddSubMenu(new Menu("JungleAIO: JClear", "JClear"));
             Config.SubMenu("JClear").AddItem(new MenuItem("UseWJC", "Use W").SetValue(true));
@@ -84,9 +99,22 @@ namespace JungleAIO.Champions
 
             Game.OnGameUpdate += JungleAIO_OnGameUpdate;
             Drawing.OnDraw += JungleAIO_OnDraw;
-            Interrupter.OnPossibleToInterrupt += JungleAIO_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += JungleAIO_OnOnEnemyGapcloser;
         }
+
+        /* 
+         * private void Interrupter2.InterruptableTargetEventArgs.InterruptableTargetEventArgs(Obj_AI_Hero unit, InterruptableSpell spell)
+        {
+            if (Config.Item("InterruptSpells").GetValue<bool>())
+            {
+                if (_spells[SpellSlot.Q].IsInRange(unit) && _spells[SpellSlot.Q].IsReady() && unit.IsEnemy)
+                {
+                    var Packets = Config.Item("usePackets").GetValue<bool>();
+                    _spells[SpellSlot.Q].CastOnUnit(unit, Packets);
+                }
+            }
+        }
+         */
 
         private void JungleAIO_OnOnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
@@ -96,10 +124,11 @@ namespace JungleAIO.Champions
             }
         }
 
+        
         private void JungleAIO_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
             if (Config.Item("InterruptSpells").GetValue<bool>())
-            {   
+            {
                 if (_spells[SpellSlot.Q].IsInRange(unit) && _spells[SpellSlot.Q].IsReady() && unit.IsEnemy)
                 {
                     var Packets = Config.Item("usePackets").GetValue<bool>();
@@ -107,6 +136,7 @@ namespace JungleAIO.Champions
                 }
             }
         }
+        
 
         private void JungleAIO_OnDraw(EventArgs args)
         {
@@ -214,13 +244,13 @@ namespace JungleAIO.Champions
                     _spells[SpellSlot.E].Cast();
                 }
             }
-        }        
+        }
 
         private void Combo()
         {
-            var Packets = Config.Item("usePackets").GetValue<bool>();           
+            var Packets = Config.Item("usePackets").GetValue<bool>();
             var randuinOmen = ItemData.Randuins_Omen.GetItem();
-            var Target = TargetSelector.GetTarget(_spells[SpellSlot.Q].Range , TargetSelector.DamageType.Magical);
+            var Target = TargetSelector.GetTarget(_spells[SpellSlot.Q].Range, TargetSelector.DamageType.Magical);
             if (Target != null)
             {
                 if (Config.Item("UseQCombo").GetValue<bool>())
@@ -257,4 +287,3 @@ namespace JungleAIO.Champions
         }
     }
 }
-*/
