@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -110,7 +110,7 @@ namespace JungleAIO.Champions
 
         private void JungleAIO_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
-            if (!Config.Item("InterruptSpells").GetValue<bool>())
+            if (Config.Item("InterruptSpells").GetValue<bool>())
             {   // if (_spells[SpellSlot.E].IsInRange(unit)
                 if (_spells[SpellSlot.E].IsInRange(unit) && _spells[SpellSlot.E].IsReady() && unit.IsEnemy)
                 {
@@ -325,7 +325,7 @@ namespace JungleAIO.Champions
                 {
                     if (_spells[SpellSlot.W].IsReady())
                     {
-                        _spells[SpellSlot.W].CastOnUnit(ObjectManager.Player);
+                        _spells[SpellSlot.W].Cast();
                     }
                 }
 
