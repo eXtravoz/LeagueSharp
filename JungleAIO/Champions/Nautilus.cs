@@ -116,8 +116,8 @@ namespace JungleAIO.Champions
                 }
             }
         }
-         */
-        /*
+         
+        
         private void JungleAIO_OnOnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (Config.Item("WGapCloser").GetValue<bool>())
