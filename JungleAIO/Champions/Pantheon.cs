@@ -9,9 +9,9 @@ using LeagueSharp.Common;
 
 #endregion
 
-namespace Pantheon
+namespace JungleAIO.Champions
 {
-    public class Program
+    class Pantheon
     {
         public const string CharName = "Pantheon";
         public static Orbwalking.Orbwalker Orbwalker;
@@ -33,7 +33,7 @@ namespace Pantheon
         public static Items.Item HPpot = new Items.Item(2003, 10);
         public static Items.Item Flask = new Items.Item(2041, 10);
 
-        public static void Main(string[] args)
+        public Pantheon()
         {
             CustomEvents.Game.OnGameLoad += OnLoad;
         }
