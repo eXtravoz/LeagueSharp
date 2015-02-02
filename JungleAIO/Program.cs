@@ -38,7 +38,7 @@ namespace JungleAIO
                     break;
                     
                     default:
-                    Game.PrintChat("[JungleAIO] - Champion Not Supported!")
+                    Game.PrintChat("[JungleAIO] - Champion Not Supported!");
                     break;
 
                 /* case "Nautilus":
