@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JungleAIO.Champions;
 
 using LeagueSharp.Common;
 using LeagueSharp;
@@ -25,13 +26,13 @@ namespace JungleAIO
             switch (ObjectManager.Player.ChampionName)
             {
                 case "Nocturne":
-                    new Champions.Nocturne();
+                    new Nocturne();
                     Game.PrintChat("Loaded - [JungleAIO]");
                     Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
                     break;
 
                 case "Nautilus":
-                    new Champions.Nautilus();
+                    new Nautilus();
                     Game.PrintChat("Loaded - [JungleAIO]");
                     Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
                     break;
