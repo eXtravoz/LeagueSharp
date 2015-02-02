@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,12 +33,6 @@ namespace JungleAIO
                     
                 case "Pantheon":
                     new Pantheon();
-                    Game.PrintChat("Loaded - [JungleAIO]");
-                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
-                    break;
-
-                case "Nautilus":
-                    new Nautilus();
                     Game.PrintChat("Loaded - [JungleAIO]");
                     Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
                     break;

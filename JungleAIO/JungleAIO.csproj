@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Champions\Nocturne.cs" />
     <Compile Include="Champions\Nautilus.cs" />
+    <Compile Include="Champions\Pantheon.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

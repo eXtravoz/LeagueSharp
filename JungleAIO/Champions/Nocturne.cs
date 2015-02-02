@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using LeagueSharp.Common;
 using LeagueSharp;
 using LeagueSharp.Common.Data;
+using JungleAIO.Champions;
 
 #endregion
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using LeagueSharp.Common;
 using LeagueSharp;
 using LeagueSharp.Common.Data;
+using JungleAIO.Champions;
 
 #endregion
 
@@ -255,7 +256,7 @@ namespace JungleAIO.Champions
                 return;
             }
 
-            if (!(Player.Distance(unit) <= W.Range) || !W.IsReady())
+            // if (!(Player.Distance(unit) <= W.Range) || !W.IsReady())
             {
                 return;
             }
@@ -276,12 +277,14 @@ namespace JungleAIO.Champions
             {
                 return;
             }
+        }
 
+            /*
             if (Q.IsReady())
             {
                 foreach (var kstarget in from kstarget in target
                                          let actualHp =
-                                             (HealthPrediction.GetHealthPrediction(kstarget, (int)(Player.Distance(kstarget) * 1000 / 1500)) <=
+                                             // (HealthPrediction.GetHealthPrediction(kstarget, (int)(Player.Distance(kstarget) * 1000 / 1500)) <=
                                               kstarget.MaxHealth * 0.15)
                                                  ? Player.GetSpellDamage(kstarget, SpellSlot.Q) * 2
                                                  : Player.GetSpellDamage(kstarget, SpellSlot.Q)
@@ -295,23 +298,24 @@ namespace JungleAIO.Champions
                     return;
                 }
             }
+             
 
             if (IgniteSlot != SpellSlot.Unknown &&
                 ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
             {
                 foreach (var kstarget in from kstarget in target
-                                         where
+                                        // where
                                              kstarget.IsValidTarget() &&
                                              kstarget.Health <=
                                              ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) &&
-                                             ObjectManager.Player.Distance(kstarget) < 600
+                                           //  ObjectManager.Player.Distance(kstarget) < 600
                                          select kstarget)
                 {
                     ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, kstarget);
                 }
             }
         }
-
+            */
         //Auto pot
         private static void AutoPot()
         {
@@ -483,12 +487,15 @@ namespace JungleAIO.Champions
                 return;
             }
 
+            /*
+
             if (Config.Item("autoQsmart").GetValue<bool>()
                 ? !Player.UnderTurret(true)
                 : Player.UnderTurret(true) && Player.Distance(target) <= Q.Range && Q.IsReady())
             {
                 Q.CastOnUnit(target, PacketCast);
             }
+             */
         }
 
         //Farm
@@ -505,7 +512,9 @@ namespace JungleAIO.Champions
             {
                 return;
             }
+        }
 
+            /*
             if (Config.Item("qFarm").GetValue<bool>() && Q.IsReady())
             {
                 foreach (var minion in from minion in minions
@@ -540,6 +549,7 @@ namespace JungleAIO.Champions
             }
         }
 
+             */
         //Jungleclear
         public static void JungleClear()
         {
