@@ -95,18 +95,19 @@ namespace JungleAIO.Champions
             Game.OnGameUpdate += JungleAIO_OnGameUpdate;
             Drawing.OnDraw += JungleAIO_OnDraw;
             Drawing.OnEndScene += JungleAIO_OnEndScene;
-            Interrupter.OnPossibleToInterrupt += JungleAIO_OnPossibleToInterrupt;
+            // Interrupter.OnPossibleToInterrupt += JungleAIO_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += JungleAIO_OnOnEnemyGapcloser;
                     
         }
 
-        private void JungleAIO_OnOnEnemyGapcloser(ActiveGapcloser gapcloser)
+        /* private void JungleAIO_OnOnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (Config.Item("WGapCloser").GetValue<bool>())
             {
                 _spells[SpellSlot.W].Cast();
             }
         }
+        */
 
         private void JungleAIO_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
@@ -127,7 +128,7 @@ namespace JungleAIO.Champions
                 var rDraw = Config.Item("DrawR").GetValue<Circle>();
                 if (rDraw.Active)
                 {
-                    Utility.DrawCircle(ObjectManager.Player.Position, 1250 + (750 * _spells[SpellSlot.R].Level), rDraw.Color, 2, 30, true);
+                    //Utility.DrawCircle(ObjectManager.Player.Position, 1250 + (750 * _spells[SpellSlot.R].Level), rDraw.Color, 2, 30, true);
                 }
             }
         }
