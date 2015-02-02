@@ -32,7 +32,7 @@ namespace JungleAIO
                     break;
                     
                 case "Pantheon":
-                    new Pantheon();
+                    new PantheonTest();
                     Game.PrintChat("Loaded - [JungleAIO]");
                     Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
                     break;
