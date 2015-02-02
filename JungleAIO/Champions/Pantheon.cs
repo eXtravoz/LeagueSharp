@@ -28,6 +28,7 @@ namespace Pantheon
         public static Obj_AI_Hero Player = ObjectManager.Player;
         //Packet casting
         public static bool PacketCast;
+        //E Fix
         public static bool UsingE;
         // Items
         public static Items.Item Biscuit = new Items.Item(2010, 10);
@@ -187,8 +188,8 @@ namespace Pantheon
             // Select default target
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
 
-            Orbwalker.SetAttack(!EFix());
-            Orbwalker.SetMovement(!EFix());
+            Orbwalker.SetAttack(!UsingE());
+            Orbwalker.SetMovement(!UsingE());
 
             //Main features with Orbwalker
             switch (Orbwalker.ActiveMode)
@@ -359,7 +360,7 @@ namespace Pantheon
         {
             if (target == null) return;
 
-            if (EFix()) return;
+            if (UsingE()) return;
 
             if (Q.IsReady() && Config.Item("useQ").GetValue<bool>())
             {
@@ -407,7 +408,7 @@ namespace Pantheon
             if (!Config.Item("harassKey").GetValue<KeyBind>().Active) return;
             if (target == null) return;
 
-            if (EFix()) return;
+            if (UsingE()) return;
 
             var mana = Player.MaxMana * (Config.Item("harassMana").GetValue<Slider>().Value / 100.0);
             if (!(Player.Mana > mana)) return;
@@ -469,7 +470,7 @@ namespace Pantheon
         //Farm
         public static void Farm()
         {
-            if (EFix()) return;
+            if (UsingE()) return;
         
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
             var mana = Player.MaxMana * (Config.Item("farmMana").GetValue<Slider>().Value / 100.0);
@@ -514,7 +515,7 @@ namespace Pantheon
         //Jungleclear
         public static void JungleClear()
         {
-            if (EFix())
+            if (UsingE())
             {
                 return;
             }
@@ -590,7 +591,7 @@ namespace Pantheon
                 return;
             }
 
-            if (EFix())
+            if (UsingE())
             {
                 return;
             }
