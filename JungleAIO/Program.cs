@@ -31,6 +31,12 @@ namespace JungleAIO
                     Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
                     break;
                     
+                case "Pantheon":
+                    new Pantheon();
+                    Game.PrintChat("Loaded - [JungleAIO]");
+                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
+                    break;
+                    
                     default:
                     new Nautilus();
                     break;
