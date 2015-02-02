@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using LeagueSharp;
 using LeagueSharp.Common;
 
@@ -12,10 +11,9 @@ using LeagueSharp.Common;
 
 namespace Pantheon
 {
-    internal class Program
+    public class Program
     {
         public const string CharName = "Pantheon";
-        public static bool InDrain;
         public static Orbwalking.Orbwalker Orbwalker;
         public static List<Spell> Spells = new List<Spell>();
         public static Spell Q;
@@ -35,18 +33,13 @@ namespace Pantheon
         public static Items.Item HPpot = new Items.Item(2003, 10);
         public static Items.Item Flask = new Items.Item(2041, 10);
 
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += OnLoad;
         }
 
         private static void OnLoad(EventArgs args)
         {
-            if (ObjectManager.Player.ChampionName != CharName)
-            {
-                return;
-            }
-
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 600);
             E = new Spell(SpellSlot.E, 700);
@@ -101,11 +94,9 @@ namespace Pantheon
                 .AddItem(
                     new MenuItem("hMode", "Harass Mode:").SetValue(new StringList(new[] { "Q only", "W+E", "W+Q" })));
             Config.SubMenu("harass")
-               .AddItem(
-                   new MenuItem("autoQ", "Auto Q").SetValue(new KeyBind("Z".ToCharArray()[0],
-                       KeyBindType.Toggle)));
-            Config.SubMenu("harass")
-                .AddItem(new MenuItem("autoQsmart", "Smart Auto Q").SetValue(true));
+                .AddItem(
+                    new MenuItem("autoQ", "Auto Q").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Toggle)));
+            Config.SubMenu("harass").AddItem(new MenuItem("autoQsmart", "Smart Auto Q").SetValue(true));
             Config.SubMenu("harass").AddItem(new MenuItem("harassMana", "Min. Mana Percent:").SetValue(new Slider(50)));
 
             //Farm Menu
@@ -188,8 +179,8 @@ namespace Pantheon
             // Select default target
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
 
-            Orbwalker.SetAttack(!UsingE());
-            Orbwalker.SetMovement(!UsingE());
+            Orbwalker.SetAttack(!EFix());
+            Orbwalker.SetMovement(!EFix());
 
             //Main features with Orbwalker
             switch (Orbwalker.ActiveMode)
@@ -247,7 +238,7 @@ namespace Pantheon
 
             if (gapcloser.Sender.IsValidTarget(Q.Range))
             {
-                Q.CastOnUnit(gapcloser.Sender, PacketCast);
+                W.CastOnUnit(gapcloser.Sender, PacketCast);
             }
         }
 
@@ -271,41 +262,49 @@ namespace Pantheon
         private static void KillSteal()
         {
             if (!Config.Item("KillSteal").GetValue<bool>())
+            {
                 return;
+            }
 
-                var target = HeroManager.Enemies;
-                if (target == null)
+            var target = HeroManager.Enemies;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (Q.IsReady())
+            {
+                foreach (var kstarget in from kstarget in target
+                    let actualHp =
+                        (HealthPrediction.GetHealthPrediction(kstarget, (int) (Player.Distance(kstarget) * 1000 / 1500)) <=
+                         kstarget.MaxHealth * 0.15)
+                            ? Player.GetSpellDamage(kstarget, SpellSlot.Q) * 2
+                            : Player.GetSpellDamage(kstarget, SpellSlot.Q)
+                    where
+                        kstarget.IsValidTarget() &&
+                        HealthPrediction.GetHealthPrediction(kstarget, (int) (Player.Distance(kstarget) * 1000 / 1500)) <=
+                        actualHp
+                    select kstarget)
                 {
+                    Q.CastOnUnit(kstarget, PacketCast);
                     return;
                 }
+            }
 
-                if (Q.IsReady())
+            if (IgniteSlot != SpellSlot.Unknown &&
+                ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
+            {
+                foreach (var kstarget in from kstarget in target
+                    where
+                        kstarget.IsValidTarget() &&
+                        kstarget.Health <=
+                        ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) &&
+                        ObjectManager.Player.Distance(kstarget) < 600
+                    select kstarget)
                 {
-                    foreach (var kstarget in from kstarget in target
-                                           let actualHp =
-                                               (HealthPrediction.GetHealthPrediction(kstarget,
-                                                   (int)(Player.Distance(kstarget) * 1000 / 1500)) <= kstarget.MaxHealth * 0.15)
-                                                   ? Player.GetSpellDamage(kstarget, SpellSlot.Q) * 2
-                                                   : Player.GetSpellDamage(kstarget, SpellSlot.Q)
-                                           where kstarget.IsValidTarget() && HealthPrediction.GetHealthPrediction(kstarget,
-                                               (int)(Player.Distance(kstarget) * 1000 / 1500)) <= actualHp
-                                           select kstarget)
-                    {
-                        Q.CastOnUnit(kstarget, PacketCast);
-                        return;
-                    }
+                    ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, kstarget);
                 }
-
-                if (IgniteSlot != SpellSlot.Unknown &&
-                    ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)                
-                {
-                    foreach (var kstarget in from kstarget in target
-                                           where kstarget.IsValidTarget() && kstarget.Health <= ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) && ObjectManager.Player.Distance(kstarget) < 600
-                                           select kstarget)
-                    {
-                         ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, kstarget);
-                    }
-                }
+            }
         }
 
         //Auto pot
@@ -358,34 +357,19 @@ namespace Pantheon
         //Combo
         public static void Combo(Obj_AI_Base target)
         {
-            if (target == null) return;
-
-            if (UsingE()) return;
-
-            if (Q.IsReady() && Config.Item("useQ").GetValue<bool>())
+            if (target == null)
             {
-                Q.CastOnUnit(target, Config.Item("usePackets").GetValue<bool>());
+                return;
             }
 
-            if (W.IsReady() && Config.Item("useW").GetValue<bool>())
+            if (EFix())
             {
-                W.CastOnUnit(target, Config.Item("usePackets").GetValue<bool>());
-            }
-
-            if (E.IsReady() && !W.IsReady() && Config.Item("useE").GetValue<bool>())
-            {
-                E.Cast(target, Config.Item("usePackets").GetValue<bool>());
-            }
-
-            if (Config.Item("comboItems").GetValue<bool>())
-            {
-                UseItems(target);
+                return;
             }
 
             if (Config.Item("useSmite").GetValue<bool>())
             {
-                if (SmiteSlot != SpellSlot.Unknown &&
-                    Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
+                if (SmiteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
                 {
                     if (Config.Item("smartSmite").GetValue<bool>())
                     {
@@ -398,20 +382,49 @@ namespace Pantheon
                 }
             }
 
-        }
+            if (Config.Item("comboItems").GetValue<bool>())
+            {
+                UseItems(target);
+            }
 
+            if (Q.IsReady() && Config.Item("useQ").GetValue<bool>())
+            {
+                Q.CastOnUnit(target, PacketCast);
+            }
+
+            if (W.IsReady() && Config.Item("useW").GetValue<bool>())
+            {
+                W.CastOnUnit(target, PacketCast);
+            }
+
+            if (E.IsReady() && !W.IsReady() && Config.Item("useE").GetValue<bool>())
+            {
+                E.Cast(target, PacketCast);
+            }
+        }
 
         //Harass
         public static void Harass(Obj_AI_Base target)
         {
+            if (!Config.Item("harassKey").GetValue<KeyBind>().Active)
+            {
+                return;
+            }
+            if (target == null)
+            {
+                return;
+            }
 
-            if (!Config.Item("harassKey").GetValue<KeyBind>().Active) return;
-            if (target == null) return;
-
-            if (UsingE()) return;
+            if (EFix())
+            {
+                return;
+            }
 
             var mana = Player.MaxMana * (Config.Item("harassMana").GetValue<Slider>().Value / 100.0);
-            if (!(Player.Mana > mana)) return;
+            if (!(Player.Mana > mana))
+            {
+                return;
+            }
 
             var menuItem = Config.Item("hMode").GetValue<StringList>().SelectedIndex;
             switch (menuItem)
@@ -450,28 +463,37 @@ namespace Pantheon
         //Auto Q
         public static void AutoQ(Obj_AI_Base target)
         {
-
-            if (!Config.Item("autoQ").GetValue<KeyBind>().Active) return;
-            if (target == null) return;
+            if (!Config.Item("autoQ").GetValue<KeyBind>().Active)
+            {
+                return;
+            }
+            if (target == null)
+            {
+                return;
+            }
 
             var mana = Player.MaxMana * (Config.Item("harassMana").GetValue<Slider>().Value / 100.0);
-            if (!(Player.Mana > mana)) return;
+            if (!(Player.Mana > mana))
+            {
+                return;
+            }
 
             if (Config.Item("autoQsmart").GetValue<bool>()
-                    ? !Player.UnderTurret(true)
-                    : Player.UnderTurret(true) && Player.Distance(target) <= Q.Range &&
-                      Q.IsReady())
+                ? !Player.UnderTurret(true)
+                : Player.UnderTurret(true) && Player.Distance(target) <= Q.Range && Q.IsReady())
             {
                 Q.CastOnUnit(target, PacketCast);
             }
-            
         }
 
         //Farm
         public static void Farm()
         {
-            if (UsingE()) return;
-        
+            if (EFix())
+            {
+                return;
+            }
+
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
             var mana = Player.MaxMana * (Config.Item("farmMana").GetValue<Slider>().Value / 100.0);
             if (!(Player.Mana > mana))
@@ -482,14 +504,16 @@ namespace Pantheon
             if (Config.Item("qFarm").GetValue<bool>() && Q.IsReady())
             {
                 foreach (var minion in from minion in minions
-                                       let actualHp =
-                                           (HealthPrediction.GetHealthPrediction(minion,
-                                               (int)(Player.Distance(minion) * 1000 / 1500)) <= minion.MaxHealth * 0.15)
-                                               ? Player.GetSpellDamage(minion, SpellSlot.Q) * 2
-                                               : Player.GetSpellDamage(minion, SpellSlot.Q)
-                                       where minion.IsValidTarget() && HealthPrediction.GetHealthPrediction(minion,
-                                           (int)(Player.Distance(minion) * 1000 / 1500)) <= actualHp
-                                       select minion)
+                    let actualHp =
+                        (HealthPrediction.GetHealthPrediction(minion, (int) (Player.Distance(minion) * 1000 / 1500)) <=
+                         minion.MaxHealth * 0.15)
+                            ? Player.GetSpellDamage(minion, SpellSlot.Q) * 2
+                            : Player.GetSpellDamage(minion, SpellSlot.Q)
+                    where
+                        minion.IsValidTarget() &&
+                        HealthPrediction.GetHealthPrediction(minion, (int) (Player.Distance(minion) * 1000 / 1500)) <=
+                        actualHp
+                    select minion)
                 {
                     Q.CastOnUnit(minion, PacketCast);
                     return;
@@ -498,7 +522,6 @@ namespace Pantheon
 
             if (Config.Item("eFarm").GetValue<bool>() && E.IsReady())
             {
-
                 foreach (var minion in
                     minions.Where(
                         minion =>
@@ -515,7 +538,7 @@ namespace Pantheon
         //Jungleclear
         public static void JungleClear()
         {
-            if (UsingE())
+            if (EFix())
             {
                 return;
             }
@@ -570,11 +593,6 @@ namespace Pantheon
                 dmg += Player.GetSpellDamage(target, SpellSlot.E);
             }
 
-            if (IgniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
-            {
-                dmg += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
-            }
-
             if (SmiteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
             {
                 dmg += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Smite);
@@ -591,7 +609,7 @@ namespace Pantheon
                 return;
             }
 
-            if (UsingE())
+            if (EFix())
             {
                 return;
             }
