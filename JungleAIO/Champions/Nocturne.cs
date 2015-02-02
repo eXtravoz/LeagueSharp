@@ -96,7 +96,7 @@ namespace JungleAIO.Champions
             Drawing.OnDraw += JungleAIO_OnDraw;
             Drawing.OnEndScene += JungleAIO_OnEndScene;
             // Interrupter.OnPossibleToInterrupt += JungleAIO_OnPossibleToInterrupt;
-            AntiGapcloser.OnEnemyGapcloser += JungleAIO_OnOnEnemyGapcloser;
+            // AntiGapcloser.OnEnemyGapcloser += JungleAIO_OnOnEnemyGapcloser;
                     
         }
 
@@ -109,7 +109,7 @@ namespace JungleAIO.Champions
         }
         */
 
-        private void JungleAIO_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
+        /* private void JungleAIO_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
             if (Config.Item("InterruptSpells").GetValue<bool>())
             {   // if (_spells[SpellSlot.E].IsInRange(unit)
@@ -120,6 +120,7 @@ namespace JungleAIO.Champions
                 }
             }
         }
+        */
 
         private void JungleAIO_OnEndScene(EventArgs args)
         {
