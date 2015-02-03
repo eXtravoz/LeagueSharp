@@ -19,7 +19,6 @@ namespace JungleAIO.Champions
 {
     class XinZhao
     {
-
         public static Obj_AI_Hero Player;
         public static Orbwalking.Orbwalker Orbwalker;
         public static Menu Config;
