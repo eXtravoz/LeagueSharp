@@ -104,7 +104,6 @@ namespace JungleAIO.Champions
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloserOnOnEnemyGapcloser;
-            Game.PrintChat("<font color='0088FF'>eXtravoz :</font> Xin Zhao loaded!");
 
         }
 
