@@ -1,4 +1,4 @@
-﻿#region
+﻿﻿#region
 
 using System;
 using System.Collections.Generic;
@@ -41,10 +41,10 @@ namespace JungleAIO.Champions
 
         public Pantheon()
         {
-            CustomEvents.Game.OnGameLoad += OnLoad;
+            OnLoad();
         }
 
-        private static void OnLoad(EventArgs args)
+        private static void OnLoad()
         {
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 600);
@@ -85,10 +85,10 @@ namespace JungleAIO.Champions
             Config.AddSubMenu(new Menu("Killsteal Settings", "KillSteal"));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal", "Auto KS enabled").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("ksQ", "KS with Q").SetValue(true));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("ksW", "KS with W").SetValue(true));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("ksE", "KS with E").SetValue(true));
+            //Config.SubMenu("KillSteal").AddItem(new MenuItem("ksW", "KS with W").SetValue(true));
+            //Config.SubMenu("KillSteal").AddItem(new MenuItem("ksE", "KS with E").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("ksI", "KS with Ignite").SetValue(true));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("ksS", "KS with Smite").SetValue(true));
+            //Config.SubMenu("KillSteal").AddItem(new MenuItem("ksS", "KS with Smite").SetValue(true));
 
             //Harass Menu
             Config.AddSubMenu(new Menu("Harass Settings", "harass"));
@@ -277,7 +277,7 @@ namespace JungleAIO.Champions
             {
                 return;
             }
-            
+
             if (Q.IsReady())
             {
                 foreach (var kstarget in from kstarget in target
@@ -296,24 +296,24 @@ namespace JungleAIO.Champions
                     return;
                 }
             }
-             
+
 
             if (IgniteSlot != SpellSlot.Unknown &&
                 ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
             {
                 foreach (var kstarget in from kstarget in target
-                                             where
-                                             kstarget.IsValidTarget() &&
-                                             kstarget.Health <=
-                                             ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) &&
-                                            ObjectManager.Player.Distance(kstarget) < 600
+                                         where
+                                         kstarget.IsValidTarget() &&
+                                         kstarget.Health <=
+                                         ObjectManager.Player.GetSummonerSpellDamage(kstarget, Damage.SummonerSpell.Ignite) &&
+                                        ObjectManager.Player.Distance(kstarget) < 600
                                          select kstarget)
                 {
                     ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, kstarget);
                 }
             }
         }
-            
+
         //Auto pot
         private static void AutoPot()
         {
@@ -484,14 +484,14 @@ namespace JungleAIO.Champions
             {
                 return;
             }
-            
+
             if (Config.Item("autoQsmart").GetValue<bool>()
                 ? !Player.UnderTurret(true)
                 : Player.UnderTurret(true) && Player.Distance(target) <= Q.Range && Q.IsReady())
             {
                 Q.CastOnUnit(target, PacketCast);
             }
-             
+
         }
 
         //Farm
@@ -509,7 +509,7 @@ namespace JungleAIO.Champions
                 return;
             }
 
-            
+
             if (Config.Item("qFarm").GetValue<bool>() && Q.IsReady())
             {
                 foreach (var minion in from minion in minions
@@ -544,7 +544,7 @@ namespace JungleAIO.Champions
             }
         }
 
-             
+
         //Jungleclear
         public static void JungleClear()
         {

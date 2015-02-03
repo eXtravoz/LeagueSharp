@@ -39,10 +39,10 @@ namespace JungleAIO.Champions
 
         public Nocturne()
         {                
-            CustomEvents.Game.OnGameLoad += OnLoad;       
+            OnLoad();       
         }
 
-        private static void OnLoad(EventArgs args)
+        private static void OnLoad()
         {
             Q = new Spell(SpellSlot.Q, 1125);
             Q.SetSkillshot(0.25f, 60f, 1600f, false, SkillshotType.SkillshotLine);
@@ -285,7 +285,7 @@ namespace JungleAIO.Champions
             }
         }
 
-        /* private static void AutoRKillable()
+        private static void AutoRKillable()
         {
             var Target = TargetSelector.GetTarget(1250 + (750 * R.Level), TargetSelector.DamageType.Physical);
             if (R.IsReady())
@@ -300,8 +300,7 @@ namespace JungleAIO.Champions
                     }
                 }
             }
-        }
-         */
+        }        
 
         private static void AutoPot()
         {
