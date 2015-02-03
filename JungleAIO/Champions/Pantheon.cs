@@ -177,7 +177,7 @@ namespace JungleAIO.Champions
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
 
             //Announce that the assembly has been loaded
-            Game.PrintChat("<font color=\"#00BFFF\">Pantheon# -</font> <font color=\"#FFFFFF\">Loaded</font>");
+            
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
