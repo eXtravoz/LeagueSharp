@@ -54,7 +54,7 @@ namespace JungleAIO
                     Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
                     Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
                     break;
-                    
+                                        
                     default:
                     Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - Champion Not Supported!");
                     break;

@@ -1,4 +1,4 @@
-﻿#region
+﻿﻿#region
 
 using System;
 using System.Collections.Generic;
@@ -256,10 +256,12 @@ namespace JungleAIO.Champions
                 return;
             }
 
-            if (unit.IsValidTarget(W.Range))
+            // if (!(Player.Distance(unit) <= W.Range) || !W.IsReady())
             {
-                W.CastOnUnit(unit);
+                return;
             }
+
+            W.CastOnUnit(unit, PacketCast);
         }
 
         //Killsteal
