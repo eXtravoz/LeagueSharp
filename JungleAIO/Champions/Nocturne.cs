@@ -1,4 +1,4 @@
-﻿#region
+#region
 
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,6 @@ namespace JungleAIO.Champions
 {
     class Nocturne
     {
-
         public static Orbwalking.Orbwalker Orbwalker;
         public static List<Spell> Spells = new List<Spell>();
         public static Spell Q;
