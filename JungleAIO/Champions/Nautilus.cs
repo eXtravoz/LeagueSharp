@@ -1,3 +1,4 @@
+﻿
 
 #region
 
@@ -293,8 +294,4 @@ namespace JungleAIO.Champions
             }
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/master

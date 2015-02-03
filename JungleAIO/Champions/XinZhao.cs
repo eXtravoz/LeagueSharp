@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -29,11 +29,7 @@ namespace JungleAIO.Champions
         public static Items.Item Biscuit = new Items.Item(2010, 10);
         public static Items.Item HPpot = new Items.Item(2003, 10);
         public static Items.Item Flask = new Items.Item(2041, 10);
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> origin/master
 
         public XinZhao()
         {
@@ -42,20 +38,12 @@ namespace JungleAIO.Champions
 
         private static void Game_OnGameLoad()
         {
-<<<<<<< HEAD
 
             Q = new Spell(SpellSlot.Q, 0f);
             W = new Spell(SpellSlot.W, 0f);
             E = new Spell(SpellSlot.E, 625f);
             R = new Spell(SpellSlot.R, 500f);
-=======
->>>>>>> origin/master
 
-            Q = new Spell(SpellSlot.Q, 0f);
-            W = new Spell(SpellSlot.W, 0f);
-            E = new Spell(SpellSlot.E, 625f);
-            R = new Spell(SpellSlot.R, 500f);
-            
             Config = new Menu("Xin Zhao", "XinZhao", true);
 
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
@@ -174,7 +162,6 @@ namespace JungleAIO.Champions
                 {
                     return;
                 }
-<<<<<<< HEAD
 
                 //Health Pots
                 if (Player.Health / 100 <= Config.Item("AP_H_Per").GetValue<Slider>().Value &&
@@ -191,24 +178,6 @@ namespace JungleAIO.Champions
             }
         }
 
-=======
-
-                //Health Pots
-                if (Player.Health / 100 <= Config.Item("AP_H_Per").GetValue<Slider>().Value &&
-                    !Player.HasBuff("RegenerationPotion", true))
-                {
-                    Items.UseItem(2003);
-                }
-                //Mana Pots
-                if (Player.Health / 100 <= Config.Item("AP_M_Per").GetValue<Slider>().Value &&
-                    !Player.HasBuff("FlaskOfCrystalWater", true))
-                {
-                    Items.UseItem(2004);
-                }
-            }
-        }
-
->>>>>>> origin/master
 
         private static void Drawing_OnDraw(EventArgs args)
         {
@@ -369,13 +338,8 @@ namespace JungleAIO.Champions
                 }
             }
         }
-<<<<<<< HEAD
 
 
-=======
-        
-        
->>>>>>> origin/master
         private static void KillSteal()
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(R.Range)))
