@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,32 +27,32 @@ namespace JungleAIO
             {
                 case "Nocturne":
                     new Nocturne();
-                    Game.PrintChat("Loaded - [JungleAIO]");
-                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
                     break;
                     
                 case "Pantheon":
                     new Pantheon();
-                    Game.PrintChat("Loaded - [JungleAIO]");
-                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
                     break;
 
-                case "Nautilus":
+                case "Nautilus":                   
                     new Nautilus();
-                    Game.PrintChat("Loaded - [JungleAIO]");
-                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
+                    break;
+
+                case "XinZhao":
+                    new XinZhao();
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
                     break;
                     
                     default:
-                    Game.PrintChat("[JungleAIO] - Champion Not Supported!");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - Champion Not Supported!");
                     break;
-
-                /* case "Nautilus":
-                    new Nautilus();
-                    Game.PrintChat("Loaded - [JungleAIO]");
-                    Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
-                    break;
-                    */
+               
 
              // case "ChampionName":
                  // new Champions.ChampionName();
