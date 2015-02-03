@@ -387,12 +387,7 @@ namespace JungleAIO.Champions
                     }
                     Player.Spellbook.CastSpell(SmiteSlot, target);
                 }
-            }
-
-            if (Config.Item("comboItems").GetValue<bool>())
-            {
-                UseItems(target);
-            }
+            }            
 
             if (Q.IsReady() && Config.Item("useQ").GetValue<bool>())
             {
@@ -402,6 +397,11 @@ namespace JungleAIO.Champions
             if (W.IsReady() && Config.Item("useW").GetValue<bool>())
             {
                 W.CastOnUnit(target, PacketCast);
+            }
+
+            if (Config.Item("comboItems").GetValue<bool>())
+            {
+                UseItems(target);
             }
 
             if (E.IsReady() && !W.IsReady() && Config.Item("useE").GetValue<bool>())
