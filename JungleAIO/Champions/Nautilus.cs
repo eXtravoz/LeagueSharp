@@ -42,10 +42,10 @@ namespace JungleAIO.Champions
         public Nautilus()
         {
             Q.SetSkillshot(0.25f, 90f, 2000f, true, SkillshotType.SkillshotLine);
-            JungleAIO_Load();
+            Game_OnGameLoad();
         }
 
-        private void JungleAIO_Load()
+        private void Game_OnGameLoad()
         {
 
             Q = new Spell(SpellSlot.Q, 1125);
@@ -88,9 +88,9 @@ namespace JungleAIO.Champions
             Config.SubMenu("JClear").AddItem(new MenuItem("JCActive", "JungleClear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             Config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("UseWFarm", "Use W").SetValue(true));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("UseEFarm", "Use E").SetValue(true));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("LClearActive", "LaneClear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("LClear").AddItem(new MenuItem("UseWFarm", "Use W").SetValue(true));
+            Config.SubMenu("LClear").AddItem(new MenuItem("UseEFarm", "Use E").SetValue(true));
+            Config.SubMenu("LClear").AddItem(new MenuItem("LClearActive", "LaneClear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             Config.AddSubMenu(new Menu("Misc Settings", "Misc"));
             Config.SubMenu("Misc").AddItem(new MenuItem("InterruptSpells", "Interrupt Spells").SetValue(true));

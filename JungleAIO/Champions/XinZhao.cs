@@ -24,7 +24,8 @@ namespace JungleAIO.Champions
         public static Menu Config;
         public static Spell Q, W, E, R;
 
-        public static SpellSlot IgniteSlot;
+        public static SpellSlot IgniteSlot = Player.GetSpellSlot("summonerdot");
+        public static SpellSlot FlashSlot = Player.GetSpellSlot("SummonerFlash");
 
         public static Items.Item Biscuit = new Items.Item(2010, 10);
         public static Items.Item HPpot = new Items.Item(2003, 10);
@@ -119,13 +120,42 @@ namespace JungleAIO.Champions
             }
         }
 
+        /*
+        private static void XinSec()
+        {
+            float fr = 400f;
+            var tx = TargetSelector.GetTarget(1025f, TargetSelector.DamageType.Physical);
+
+            if (tx != null)
+            {
+                return;
+            }
+
+            if (Player.Distance(tx) < E.Range)
+            {
+                if (E.IsReady())
+                {
+                    if (R.IsReady())
+                    {
+                        var txExtended = tx.Position.Extend(tx.Position, 200f);
+                        E.Cast(tx);
+                        if (Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready)
+                        {
+                            R.Cast();
+                            Player.Spellbook.CastSpell(FlashSlot, txExtended);
+                        }
+                    }
+                }
+            }
+        }
+        */
 
         private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
 
             if (Config.Item("SpellInterrupt").GetValue<bool>())
             {
-                if (Player.Distance(unit) < R.Range && R.IsReady())
+                if (unit.IsValidTarget(R.Range) && R.IsReady())
                 {
                     R.Cast();
                 }

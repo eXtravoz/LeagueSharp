@@ -41,10 +41,10 @@ namespace JungleAIO.Champions
 
         public Pantheon()
         {
-            OnLoad();
+            Game_OnGameLoad();
         }
 
-        private static void OnLoad()
+        private static void Game_OnGameLoad()
         {
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 600);
@@ -177,7 +177,7 @@ namespace JungleAIO.Champions
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
 
             //Announce that the assembly has been loaded
-            
+
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -389,11 +389,6 @@ namespace JungleAIO.Champions
                 }
             }
 
-            if (Config.Item("comboItems").GetValue<bool>())
-            {
-                UseItems(target);
-            }
-
             if (Q.IsReady() && Config.Item("useQ").GetValue<bool>())
             {
                 Q.CastOnUnit(target, PacketCast);
@@ -402,6 +397,11 @@ namespace JungleAIO.Champions
             if (W.IsReady() && Config.Item("useW").GetValue<bool>())
             {
                 W.CastOnUnit(target, PacketCast);
+            }
+
+            if (Config.Item("comboItems").GetValue<bool>())
+            {
+                UseItems(target);
             }
 
             if (E.IsReady() && !W.IsReady() && Config.Item("useE").GetValue<bool>())

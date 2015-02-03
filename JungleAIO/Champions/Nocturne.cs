@@ -38,11 +38,11 @@ namespace JungleAIO.Champions
         public static Items.Item Flask = new Items.Item(2041, 10);
 
         public Nocturne()
-        {                
-            OnLoad();       
+        {
+            Game_OnGameLoad();       
         }
 
-        private static void OnLoad()
+        private static void Game_OnGameLoad()
         {
             Q = new Spell(SpellSlot.Q, 1125);
             Q.SetSkillshot(0.25f, 60f, 1600f, false, SkillshotType.SkillshotLine);
