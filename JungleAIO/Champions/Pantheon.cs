@@ -256,12 +256,10 @@ namespace JungleAIO.Champions
                 return;
             }
 
-            // if (!(Player.Distance(unit) <= W.Range) || !W.IsReady())
+            if (unit.IsValidTarget(W.Range))
             {
-                return;
+                W.CastOnUnit(unit);
             }
-
-            W.CastOnUnit(unit, PacketCast);
         }
 
         //Killsteal
