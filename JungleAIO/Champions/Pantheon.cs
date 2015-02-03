@@ -41,10 +41,10 @@ namespace JungleAIO.Champions
 
         public Pantheon()
         {
-            CustomEvents.Game.OnGameLoad += OnLoad;
+            OnLoad();
         }
 
-        private static void OnLoad(EventArgs args)
+        private static void OnLoad()
         {
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 600);
