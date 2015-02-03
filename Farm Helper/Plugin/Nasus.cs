@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public Nasus()
         {
             _spells[SpellSlot.Q].SetTargetted(0.5f, 0f);
-            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
+            Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad(EventArgs args)
+        private void Game_OnGameLoad()
         {
             var fm = _config = new Menu("Nasus FHelper", "FMNasus", true);
             fm.SubMenu("FMNasus").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));

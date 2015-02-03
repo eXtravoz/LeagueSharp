@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public Annie()
         {
             _spells[SpellSlot.Q].SetTargetted(0.25f, 1400);
-            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
+            Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad(EventArgs args)
+        private void Game_OnGameLoad()
         {
             var fm = _config = new Menu("Annie FHelper", "FMAnnie", true);
             fm.SubMenu("FMAnnie").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));

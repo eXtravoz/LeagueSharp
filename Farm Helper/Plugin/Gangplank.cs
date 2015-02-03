@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public Gangplank()
         {
             _spells[SpellSlot.Q].SetTargetted(0.5f, 2000f);
-            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
+            Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad(EventArgs args)
+        private void Game_OnGameLoad()
         {
             var fm = _config = new Menu("Gangplank FHelper", "FMGangplank", true);
             fm.SubMenu("FMGnagplank").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));

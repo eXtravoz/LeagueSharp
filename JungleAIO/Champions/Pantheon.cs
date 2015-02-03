@@ -387,7 +387,11 @@ namespace JungleAIO.Champions
                     }
                     Player.Spellbook.CastSpell(SmiteSlot, target);
                 }
+<<<<<<< HEAD
             }
+=======
+            }            
+>>>>>>> origin/master
 
             if (Q.IsReady() && Config.Item("useQ").GetValue<bool>())
             {
