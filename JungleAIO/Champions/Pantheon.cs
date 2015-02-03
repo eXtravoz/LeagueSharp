@@ -85,10 +85,10 @@ namespace JungleAIO.Champions
             Config.AddSubMenu(new Menu("Killsteal Settings", "KillSteal"));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal", "Auto KS enabled").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("ksQ", "KS with Q").SetValue(true));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("ksW", "KS with W").SetValue(true));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("ksE", "KS with E").SetValue(true));
+            //Config.SubMenu("KillSteal").AddItem(new MenuItem("ksW", "KS with W").SetValue(true));
+            //Config.SubMenu("KillSteal").AddItem(new MenuItem("ksE", "KS with E").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("ksI", "KS with Ignite").SetValue(true));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("ksS", "KS with Smite").SetValue(true));
+            //Config.SubMenu("KillSteal").AddItem(new MenuItem("ksS", "KS with Smite").SetValue(true));
 
             //Harass Menu
             Config.AddSubMenu(new Menu("Harass Settings", "harass"));
