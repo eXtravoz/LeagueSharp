@@ -660,6 +660,34 @@ namespace JungleAIO.Champions
                 break;
             }
         }
+        
+        private static void AutoSmite()
+        {
+
+            // Thanks to FedNocturne from gFederal
+            if (SmiteSlot == SpellSlot.Unknown)
+            {
+                if (Config.Item("AutoSmite").GetValue<KeyBind>().Active)
+                {
+                    string[] monsterNames = { "LizardElder", "AncientGolem", "Worm", "Dragon" };
+                    var firstOrDefault = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(
+                        spell => spell.Name.Contains("mite"));
+                    if (firstOrDefault == null) return;
+
+                    var vMonsters = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, firstOrDefault.SData.CastRange[0], MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.Health);
+                    foreach (var vMonster in vMonsters.Where(vMonster => vMonster != null
+                                                                      && !vMonster.IsDead
+                                                                      && !ObjectManager.Player.IsDead
+                                                                      && !ObjectManager.Player.IsStunned
+                                                                      && SmiteSlot != SpellSlot.Unknown
+                                                                      && ObjectManager.Player.Spellbook.CanUseSpell(SmiteSlot) == SpellState.Ready)
+                                                                      .Where(vMonster => (vMonster.Health < ObjectManager.Player.GetSummonerSpellDamage(vMonster, Damage.SummonerSpell.Smite)) && (monsterNames.Any(name => vMonster.BaseSkinName.StartsWith(name)))))
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(SmiteSlot, vMonster);
+                    }
+                }
+            }
+        }
 
         //E Fix
         public static bool EFix()
