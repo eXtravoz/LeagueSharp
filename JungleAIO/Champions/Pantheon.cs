@@ -142,6 +142,7 @@ namespace JungleAIO.Champions
             Config.SubMenu("misc").AddItem(new MenuItem("stopChannel", "Interrupt Spells").SetValue(true));
             Config.SubMenu("misc").AddItem(new MenuItem("gapcloser", "Interrupt Gapclosers").SetValue(true));
             Config.SubMenu("misc").AddItem(new MenuItem("usePackets", "Use Packets to Cast Spells").SetValue(false));
+            Config.SubMenu("misc").AddItem(new MenuItem("AutoSmite", "Auto Smite").SetValue<KeyBind>(new KeyBind('J', KeyBindType.Toggle)));
             Config.SubMenu("misc")
                 .AddItem(
                     new MenuItem("autolvlup", "Auto Level Spells").SetValue(
