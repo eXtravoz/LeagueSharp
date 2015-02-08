@@ -36,6 +36,12 @@ namespace JungleAIO
                     Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
                     Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
                     break;
+                    
+                case "Hecarim":
+                    new Hecarim();
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
+                    break;
 
                 case "Nautilus":                   
                     new Nautilus();
