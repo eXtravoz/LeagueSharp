@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public Veigar()
         {
             _spells[SpellSlot.Q].SetTargetted(0.5f, 0f);
-            Game_OnGameLoad;
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad()
+        private void Game_OnGameLoad(EventArgs args)
         {
             var fm = _config = new Menu("Veigear FHelper", "FMVeigar", true);
             fm.SubMenu("FMVeigar").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));
