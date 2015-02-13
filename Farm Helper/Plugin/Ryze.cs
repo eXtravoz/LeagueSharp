@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public Ryze()
         {
             _spells[SpellSlot.Q].SetTargetted(0.5f, 1400f);
-            Game_OnGameLoad;
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad()
+        private void Game_OnGameLoad(EventArgs args)
         {
             var fm = _config = new Menu("Ryze FHelper", "FMRyze", true);
             fm.SubMenu("FMRyze").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));

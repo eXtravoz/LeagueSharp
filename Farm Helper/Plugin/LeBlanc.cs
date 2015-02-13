@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public LeBlanc()
         {
             _spells[SpellSlot.Q].SetTargetted(0.5f, 2000f);
-            Game_OnGameLoad;
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad()
+        private void Game_OnGameLoad(EventArgs args)
         {
             var fm = _config = new Menu("LeBlanc FHelper", "FMLeBlanc", true);
             fm.SubMenu("FMLeBlanc").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));

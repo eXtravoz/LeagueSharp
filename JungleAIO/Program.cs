@@ -30,9 +30,24 @@ namespace JungleAIO
             
             if (ObjectManager.Player.BaseSkinName == "Nautilus")
             {
+<<<<<<< HEAD
                 new Champions.Nautilus();
                 Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Nautilus Plugin!");
             }
+=======
+                case "Nocturne":
+                    new Nocturne();
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
+                    break;
+                    
+                case "Pantheon":
+                    new Pantheon();
+                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
+                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
+                    break;
+            
+>>>>>>> origin/master
 
             if (ObjectManager.Player.BaseSkinName == "Nocturne")
             {

@@ -20,10 +20,10 @@ namespace FarmHelper.Plugin
         public Akali()
         {
             _spells[SpellSlot.Q].SetTargetted(0.65f, 1000);
-            Game_OnGameLoad;
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        private void Game_OnGameLoad()
+        private void Game_OnGameLoad(EventArgs args)
         {
             var fm = _config = new Menu("Akali FHelper", "FMAkali", true);
             fm.SubMenu("FMAkali").AddItem(new MenuItem("fmEnable", "Enabled").SetValue(true));
