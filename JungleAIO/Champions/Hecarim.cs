@@ -13,12 +13,12 @@ using Color = System.Drawing.Color;
 
 namespace JungleAIO.Champions
 {
-    class Hecarim 
+    class Hecarim : Program
     {
 
         public static Obj_AI_Hero Player;
         public static Orbwalking.Orbwalker Orbwalker;
-        public static Menu Config;
+        public static Menu _Menu;
         public static Spell Q, W, E, R;
 
         public static SpellSlot IgniteSlot = Player.GetSpellSlot("summonerdot");
@@ -32,9 +32,7 @@ namespace JungleAIO.Champions
         public Hecarim() 
         {
             Game_OnGameLoad();
-        }
-
-        
+        }       
 
         private static void Game_OnGameLoad() 
         {
@@ -46,70 +44,80 @@ namespace JungleAIO.Champions
             E = new Spell(SpellSlot.E, self);
             R = new Spell(SpellSlot.R, 1350);
 
-            R.SetSkillshot(0.5f, 200f, 1200f, false, SkillshotType.SkillshotLine);
-
-            MenuConstructor();
+            R.SetSkillshot(0.5f, 200f, 1200f, false, SkillshotType.SkillshotLine);             
 
             Game.OnGameUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
-        }
 
-        private static void MenuConstructor() 
-        {
-            Config = new Menu("Xin Zhao", "XinZhao", true);
+            _Menu = new Menu("Hecarim", "HecarimMenu", true);
+            var orbwalkerMenu = new Menu("Orbwalker", "OrbwalkerMenu");
+            Orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-            Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
+            _Menu.AddSubMenu(orbwalkerMenu);
+            TargetSelector.AddToMenu(_Menu);
 
-            var SimpleTs = new Menu("Target Selector", "Target Selector");
-            TargetSelector.AddToMenu(SimpleTs);
-            Config.AddSubMenu(SimpleTs);
+            var comboMenu = new Menu("Combo Settings", "Combo");
+            {
+                comboMenu.AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
+                comboMenu.AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
+                comboMenu.AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
+                comboMenu.AddItem(new MenuItem("UseRCombo", "Use R ( Start Combo )").SetValue(true));
+            }
+            _Menu.AddSubMenu(comboMenu);
 
-            Config.AddSubMenu(new Menu("Combo Settings", "Combo"));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R ( Start Combo )").SetValue(true));
+            var farmMenu = new Menu("Farm Settings", "Farm");
+            {
+                farmMenu.AddItem(new MenuItem("UseQFarm", "Use Q").SetValue(true));
+                farmMenu.AddItem(new MenuItem("UseWFarm", "Use W").SetValue(true));
+            }
+            _Menu.AddSubMenu(farmMenu);
 
-            Config.AddSubMenu(new Menu("LaneClear", "Farm"));
-            Config.SubMenu("Farm").AddItem(new MenuItem("UseQFarm", "Use Q").SetValue(true));
-            Config.SubMenu("Farm").AddItem(new MenuItem("UseWFarm", "Use W").SetValue(true));
+            var jungleMenu = new Menu("Jungle Settings", "JCLear");
+            {
+                jungleMenu.AddItem(new MenuItem("UseQJC", "Use Q").SetValue(true));
+                jungleMenu.AddItem(new MenuItem("UseQJC", "Use W").SetValue(true));
+                jungleMenu.AddItem(new MenuItem("AutoSmite", "Auto Smite").SetValue<KeyBind>(new KeyBind('J', KeyBindType.Toggle)));
+            }
+            _Menu.AddSubMenu(jungleMenu);
 
-            Config.AddSubMenu(new Menu("JungleClear", "JClear"));
-            Config.SubMenu("JClear").AddItem(new MenuItem("UseQJC", "Use Q").SetValue(true));
-            Config.SubMenu("JClear").AddItem(new MenuItem("UseWJC", "Use W").SetValue(true));
-            Config.SubMenu("JClear").AddItem(new MenuItem("AutoSmite", "Auto Smite").SetValue<KeyBind>(new KeyBind('J', KeyBindType.Toggle)));
+            var potsMenu = new Menu("Potion Manager", "AutoPot");
+            {
+                potsMenu.AddItem(new MenuItem("AutoPot", "Enable Auto-Pot").SetValue(true));
+                potsMenu.AddItem(new MenuItem("AP_H", "Health Pot").SetValue(true));
+                potsMenu.AddItem(new MenuItem("AP_M", "Mana Pot").SetValue(true));
+                potsMenu.AddItem(new MenuItem("AP_H_Per", "Health Pot %").SetValue(new Slider(35, 1)));
+                potsMenu.AddItem(new MenuItem("AP_M_Per", "Mana Pot %").SetValue(new Slider(35, 1)));
+                potsMenu.AddItem(new MenuItem("AP_Ign", "Auto pot when ignited").SetValue(true));
+            }
+            _Menu.AddSubMenu(potsMenu);
 
-            Config.AddSubMenu(new Menu("AutoPot", "AutoPot"));
-            Config.SubMenu("AutoPot").AddItem(new MenuItem("AutoPot", "AutoPot enabled").SetValue(true));
-            Config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H", "Health Pot").SetValue(true));
-            Config.SubMenu("AutoPot").AddItem(new MenuItem("AP_M", "Mana Pot").SetValue(true));
-            Config.SubMenu("AutoPot").AddItem(new MenuItem("AP_H_Per", "Health Pot %").SetValue(new Slider(35, 1)));
-            Config.SubMenu("AutoPot").AddItem(new MenuItem("AP_M_Per", "Mana Pot %").SetValue(new Slider(35, 1)));
-            Config.SubMenu("AutoPot").AddItem(new MenuItem("AP_Ign", "Auto pot when ignite").SetValue(true));
+            var miscMenu = new Menu("Misc Settings", "Misc");
+            {
+                miscMenu.AddItem(new MenuItem("InterruptSpells", "Interrupt Spells").SetValue(true));
+                miscMenu.AddItem(new MenuItem("InterruptSpellsR", "Interrupt with R").SetValue(true));
+                miscMenu.AddItem(new MenuItem("usePackets", "Use Packets").SetValue(false));
+            }
+            _Menu.AddSubMenu(miscMenu);
 
-            Config.AddSubMenu(new Menu("Misc Settings", "Misc"));
-            Config.SubMenu("Misc").AddItem(new MenuItem("InterruptSpells", "Interrupt Spells").SetValue(true));
-            Config.SubMenu("Misc").AddItem(new MenuItem("InterruptSpellsR", "Interrupt with R").SetValue(true));
-            Config.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Use Packets").SetValue(true));
-
-            Config.AddSubMenu(new Menu("Drawings Settings", "Drawing"));
-            Config.SubMenu("Drawing").AddItem(new MenuItem("DrawQ", "Draw Q").SetValue(true));
-            Config.SubMenu("Drawing").AddItem(new MenuItem("DrawW", "Draw W").SetValue(true));
-            Config.SubMenu("Drawing").AddItem(new MenuItem("DrawR", "Draw R").SetValue(true));
-
+            var drawMenu = new Menu("Drawing Settings", "Drawing");
+            {
+                drawMenu.AddItem(new MenuItem("DrawQ", "Draw Q").SetValue(true));
+                drawMenu.AddItem(new MenuItem("DrawW", "Draw W").SetValue(true));
+                drawMenu.AddItem(new MenuItem("DrawR", "Draw R").SetValue(true));
+            }
+            _Menu.AddSubMenu(miscMenu);
         }       
 
         private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
-            if (Config.Item("InterruptSpells").GetValue<bool>())
+            if (_Menu.Item("InterruptSpells").GetValue<bool>())
                 return;         
-            var packetCast = Config.Item("usePackets").GetValue<bool>();
+            var packetCast = _Menu.Item("usePackets").GetValue<bool>();
             if (unit.IsValidTarget(E.Range)) {
                 E.CastOnUnit(Player, packetCast);
             }
-            if (Config.Item("InterruptSpellsR").GetValue<bool>())
+            if (_Menu.Item("InterruptSpellsR").GetValue<bool>())
                 if (unit.IsValidTarget(R.Range))
                     R.CastOnUnit(unit, packetCast);
             
@@ -119,9 +127,9 @@ namespace JungleAIO.Champions
         private static void Drawing_OnDraw(EventArgs args)
         {
 
-            var qSprite = Config.Item("DrawQ").GetValue<bool>();
-            var wSprite = Config.Item("DrawW").GetValue<bool>();
-            var rSprite = Config.Item("DrawR").GetValue<bool>();
+            var qSprite = _Menu.Item("DrawQ").GetValue<bool>();
+            var wSprite = _Menu.Item("DrawW").GetValue<bool>();
+            var rSprite = _Menu.Item("DrawR").GetValue<bool>();
             var pos = Player.Position;
 
             if (!Player.IsDead)
@@ -167,7 +175,7 @@ namespace JungleAIO.Champions
 
         private static void AutoPot()
         {
-            if (Config.Item("AutoPot").GetValue<bool>())
+            if (_Menu.Item("AutoPot").GetValue<bool>())
             {
                 if (Player.HasBuff("summonerdot") || Player.HasBuff("MordekaiserChildrenOfTheGrave"))
                 {
@@ -197,13 +205,13 @@ namespace JungleAIO.Champions
                 }
 
                 //Health Pots
-                if (Player.Health / 100 <= Config.Item("AP_H_Per").GetValue<Slider>().Value &&
+                if (Player.Health / 100 <= _Menu.Item("AP_H_Per").GetValue<Slider>().Value &&
                     !Player.HasBuff("RegenerationPotion", true))
                 {
                     Items.UseItem(2003);
                 }
                 //Mana Pots
-                if (Player.Health / 100 <= Config.Item("AP_M_Per").GetValue<Slider>().Value &&
+                if (Player.Health / 100 <= _Menu.Item("AP_M_Per").GetValue<Slider>().Value &&
                     !Player.HasBuff("FlaskOfCrystalWater", true))
                 {
                     Items.UseItem(2004);
@@ -216,7 +224,7 @@ namespace JungleAIO.Champions
             // Thanks to FedNocturne from gFederal
             if (SmiteSlot == SpellSlot.Unknown)
             {
-                if (Config.Item("AutoSmite").GetValue<KeyBind>().Active)
+                if (_Menu.Item("AutoSmite").GetValue<KeyBind>().Active)
                 {
                     string[] monsterNames = { "LizardElder", "AncientGolem", "Worm", "Dragon" };
                     var firstOrDefault = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(
@@ -245,12 +253,12 @@ namespace JungleAIO.Champions
             {
                 var mob = mobs[0];
 
-                if (Q.IsReady() && Config.Item("UseQJC").GetValue<bool>())
+                if (Q.IsReady() && _Menu.Item("UseQJC").GetValue<bool>())
                 {
                     Q.Cast();
                 }
 
-                if (W.IsReady() && Config.Item("UseWJC").GetValue<bool>())
+                if (W.IsReady() && _Menu.Item("UseWJC").GetValue<bool>())
                 {
                     W.Cast();
                 }
@@ -264,13 +272,13 @@ namespace JungleAIO.Champions
             {
                 var minion = minions[0];
 
-                if (Config.Item("UseQFarm").GetValue<bool>() && Q.IsReady() &&
+                if (_Menu.Item("UseQFarm").GetValue<bool>() && Q.IsReady() &&
                     minion.IsValidTarget(Q.Range))
                 {
                     Q.Cast();
                 }
 
-                if (Config.Item("UseWFarm").GetValue<bool>() && W.IsReady() &&
+                if (_Menu.Item("UseWFarm").GetValue<bool>() && W.IsReady() &&
                     minion.IsValidTarget(W.Range))
                 {
                     W.Cast();
@@ -281,38 +289,34 @@ namespace JungleAIO.Champions
         private static void Combo(Obj_AI_Hero tx)
         {            
 
-            var qUsage = Config.Item("UseQCombo").GetValue<bool>();
-            var wUsage = Config.Item("UseWCombo").GetValue<bool>();
-            var eUsage = Config.Item("UseECombo").GetValue<bool>();
-            var rUsage = Config.Item("UseRCombo").GetValue<bool>();
-            bool db = true;
-
-            if (tx != null) 
-            {
-                if (eUsage)
+            bool qUsage = _Menu.Item("UseQCombo").GetValue<bool>();
+            bool wUsage = _Menu.Item("UseWCombo").GetValue<bool>();
+            bool eUsage = _Menu.Item("UseECombo").GetValue<bool>();
+            bool rUsage = _Menu.Item("UseRCombo").GetValue<bool>();
+            
+                if (eUsage && tx != null)
                 {
                     if (E.IsReady() && tx.IsValidTarget(300f))
                         E.Cast();
                 }
 
-                if (rUsage)
+                if (rUsage && tx != null)
                 {
                     if (R.IsReady() && tx.IsValidTarget(R.Range))
                         R.Cast(tx);
                 }
 
-                if (qUsage)
+                if (qUsage && tx != null)
                 {
                     if (Q.IsReady() && tx.IsValidTarget(Q.Range))
                         Q.Cast();
                 }
 
-                if (wUsage)
+                if (wUsage && tx != null)
                 {
                     if (W.IsReady() && tx.IsValidTarget(W.Range))
                         W.Cast();
-                }
-            }
+                }           
         }  
      }
  }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JungleAIO.Champions;
 
 using LeagueSharp.Common;
 using LeagueSharp;
@@ -22,46 +21,42 @@ namespace JungleAIO
         }
 
         static void Game_OnGameLoad(EventArgs args)
-        {
-            switch (ObjectManager.Player.ChampionName)
+        {           
+            if (ObjectManager.Player.BaseSkinName == "Hecarim")
             {
-                case "Nocturne":
-                    new Nocturne();
-                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
-                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
-                    break;
-                    
-                case "Pantheon":
-                    new Pantheon();
-                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
-                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
-                    break;
-
-                case "Nautilus":                   
-                    new Nautilus();
-                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
-                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
-                    break;
-
-                case "XinZhao":
-                    new XinZhao();
-                    Game.PrintChat("<font color='0088FF'> Loaded - [JungleAIO] </font>");
-                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - " + ObjectManager.Player.ChampionName);
-                    break;
-                                        
-                    default:
-                    Game.PrintChat("<font color='0088FF'>[JungleAIO]</font> - Champion Not Supported!");
-                    break;
-               
-
-             // case "ChampionName":
-                 // new Champions.ChampionName();
-                 // Game.PrintChat("Loaded - [JungleAIO]");
-                 // Game.PrintChat("[JungleAIO] - " + ObjectManager.Player.ChampionName);
-                 // break;
+                new Champions.Hecarim();
+                Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Hecarim Plugin!");
+            }
+            
+            if (ObjectManager.Player.BaseSkinName == "Nautilus")
+            {
+                new Champions.Nautilus();
+                Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Nautilus Plugin!");
             }
 
-            
+            if (ObjectManager.Player.BaseSkinName == "Nocturne")
+            {
+                new Champions.Nocturne();
+                Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Nocturne Plugin!");
+            }
+
+            if (ObjectManager.Player.BaseSkinName == "Pantheon")
+            {
+                new Champions.Pantheon();
+                Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Pantheon Plugin!");
+            }
+
+            if (ObjectManager.Player.BaseSkinName == "Warwick")
+            {
+                new Champions.Warwick();
+                Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Warwick Plugin!");
+            }
+
+            if (ObjectManager.Player.BaseSkinName.Contains("Zhao"))
+            {
+                new Champions.XinZhao();
+                Game.PrintChat("<font color='#881df2'>[JungleAIO] - </font> Xin Zhao Plugin!");
+            }            
         }
     }
 }
