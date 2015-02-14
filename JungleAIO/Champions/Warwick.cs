@@ -14,7 +14,7 @@ using Color = System.Drawing.Color;
 
 namespace JungleAIO.Champions
 {
-    class Warwick
+    class Warwick : Program
     {
         public static Orbwalking.Orbwalker Orbwalker;
         public static List<Spell> Spells = new List<Spell>();

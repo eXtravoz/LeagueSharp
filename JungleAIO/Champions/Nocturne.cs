@@ -17,7 +17,7 @@ using Color = System.Drawing.Color;
 
 namespace JungleAIO.Champions
 {
-    class Nocturne
+    class Nocturne : Program
     {
 
         public static Orbwalking.Orbwalker Orbwalker;
@@ -454,7 +454,7 @@ namespace JungleAIO.Champions
             // Thanks to FedNocturne from gFederal
             if (SmiteSlot == SpellSlot.Unknown)
             {
-                if (Config.Item("AutoSmite").GetValue<KeyBind>().Active)
+                if (!Config.Item("AutoSmite").GetValue<KeyBind>().Active)
                 {
                     string[] monsterNames = { "LizardElder", "AncientGolem", "Worm", "Dragon" };
                     var firstOrDefault = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(

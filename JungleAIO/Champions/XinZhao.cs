@@ -17,7 +17,7 @@ using Color = System.Drawing.Color;
 
 namespace JungleAIO.Champions
 {
-    class XinZhao
+    class XinZhao : Program
     {
         public static Obj_AI_Hero Player;
         public static Orbwalking.Orbwalker Orbwalker;
@@ -105,7 +105,6 @@ namespace JungleAIO.Champions
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloserOnOnEnemyGapcloser;
-            Game.PrintChat("<font color='0088FF'>eXtravoz :</font> Xin Zhao loaded!");
 
         }
 
@@ -118,37 +117,7 @@ namespace JungleAIO.Champions
                     R.Cast(gapcloser.Sender);
                 }
             }
-        }
-
-        /*
-        private static void XinSec()
-        {
-            float fr = 400f;
-            var tx = TargetSelector.GetTarget(1025f, TargetSelector.DamageType.Physical);
-
-            if (tx != null)
-            {
-                return;
-            }
-
-            if (Player.Distance(tx) < E.Range)
-            {
-                if (E.IsReady())
-                {
-                    if (R.IsReady())
-                    {
-                        var txExtended = tx.Position.Extend(tx.Position, 200f);
-                        E.Cast(tx);
-                        if (Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready)
-                        {
-                            R.Cast();
-                            Player.Spellbook.CastSpell(FlashSlot, txExtended);
-                        }
-                    }
-                }
-            }
-        }
-        */
+        }        
 
         private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Hero unit, InterruptableSpell spell)
         {
