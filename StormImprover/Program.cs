@@ -20,7 +20,7 @@ namespace StormImprover
         {
             CharacterManager = ObjectManager.Player.BaseSkinName;           
 
-            if (ObjectManager.Player.BaseSkinName != "Mordekaiser")
+            if (ObjectManager.Player.BaseSkinName == "Mordekaiser")
             {
                 new Addons.Mordekaiser();
                 Game.PrintChat("<font color='#2F4F4F'>StormImprover [Addon] - </font>Mordekaiser");
