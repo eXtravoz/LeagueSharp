@@ -85,6 +85,8 @@ namespace StormImprover.Addons
 
             _Menu.AddSubMenu(new Menu("Misc Settings", "Misc"));
             _Menu.SubMenu("Misc").AddItem(new MenuItem("WGapCloser", "Auto W on Gapcloser").SetValue(true));
+            _Menu.SubMenu("Misc").AddItem(new MenuItem("eHarass", "Auto Harass w/ E").SetValue(true));
+            _Menu.SubMenu("Misc").AddItem(new MenuItem("Disrespecter", "Disrespect Mode").SetValue(false));
             _Menu.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Packets").SetValue(false));
 
             _Menu.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -98,6 +100,7 @@ namespace StormImprover.Addons
             Drawing.OnDraw += OnDraw;
             Orbwalking.AfterAttack += AfterAttack;
             AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
+            Game.OnGameNotifyEvent += Game_OnGameNotifyEvent;
 
             // Damage Calculator
             Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
@@ -119,13 +122,13 @@ namespace StormImprover.Addons
 
             if (_Menu.Item("uBilgewaterCutlass").GetValue<bool>() && target != null)
             {
-                if (BilgewaterCutlass.IsOwned() && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
+                if (BilgewaterCutlass.IsOwned(ObjectManager.Player) && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
                     BilgewaterCutlass.Cast(target);
             }
 
             if (_Menu.Item("uHexTech").GetValue<bool>() && target != null)
             {
-                if (HexTech.IsOwned() && HexTech.IsReady() && BilgewaterCutlass.IsInRange(target))
+                if (HexTech.IsOwned(ObjectManager.Player) && HexTech.IsReady() && BilgewaterCutlass.IsInRange(target))
                     HexTech.Cast(target);
             }
 
@@ -200,6 +203,15 @@ namespace StormImprover.Addons
                 LaneClear();
             if (_Menu.Item("AutoPot").GetValue<bool>())
                 AutoPot();
+            if (_Menu.Item("eHarass").GetValue<bool>())
+                eHrass();
+        }
+
+        private static void eHrass()
+        {
+            var eTarget = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+            if (E.IsReady() && eTarget.IsValidTarget(E.Range))
+                E.Cast(eTarget);
         }
 
         private static void UseIgnite(Obj_AI_Hero unit)
@@ -305,10 +317,10 @@ namespace StormImprover.Addons
             var BilgewaterCutlass = ItemData.Bilgewater_Cutlass.GetItem();
             var HexTech = ItemData.Hextech_Revolver.GetItem();
 
-            if (HexTech.IsOwned() && HexTech.IsReady() && HexTech.IsInRange(target))
+            if (HexTech.IsOwned(ObjectManager.Player) && HexTech.IsReady() && HexTech.IsInRange(target))
                 dmg += ObjectManager.Player.GetItemDamage(target, Damage.DamageItems.Hexgun);
 
-            if (BilgewaterCutlass.IsOwned() && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
+            if (BilgewaterCutlass.IsOwned(ObjectManager.Player) && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
                 dmg += ObjectManager.Player.GetItemDamage(target, Damage.DamageItems.Bilgewater);
 
             return (float)dmg;
@@ -321,6 +333,22 @@ namespace StormImprover.Addons
                 var menuItem = _Menu.Item(spell.Slot + "Range").GetValue<Circle>();
                 if (menuItem.Active)
                     Render.Circle.DrawCircle(ObjectManager.Player.Position, spell.Range, menuItem.Color);
+            }
+        }
+
+        private static void Game_OnGameNotifyEvent(GameNotifyEventArgs args)
+        {
+            if (args.NetworkId != ObjectManager.Player.NetworkId)
+                return;
+
+            if (_Menu.Item("Disrespecter").GetValue<bool>())
+            {
+                switch (args.EventId)
+                {
+                    case GameEventId.OnKill:
+                        Game.Say("/laugh");
+                        break;
+                }
             }
         }
     }
