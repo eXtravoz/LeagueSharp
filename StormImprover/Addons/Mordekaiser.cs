@@ -67,7 +67,6 @@ namespace StormImprover.Addons
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseQ", "Use Q").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseW", "Use W").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseE", "Use E").SetValue(true));
-            _Menu.SubMenu("Combo").AddItem(new MenuItem("UseR", "If killable use R/Ign").SetValue(false));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(_Menu.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             _Menu.AddSubMenu(new Menu("Potion Manager", "PotionManager"));
