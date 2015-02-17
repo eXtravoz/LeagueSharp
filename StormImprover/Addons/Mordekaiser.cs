@@ -26,6 +26,11 @@ namespace StormImprover.Addons
         public static Menu _Menu;
         public static Orbwalking.Orbwalker Orbwalker;
 
+        public static bool ultImprover = false;
+
+        public static Items.Item Potion = new Items.Item(2003, 0);
+        public static Items.Item ManaPotion = new Items.Item(2004, 0);
+
         public Mordekaiser()
         {
             Game_OnGameLoad();            
@@ -62,17 +67,11 @@ namespace StormImprover.Addons
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseQ", "Use Q").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseW", "Use W").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseE", "Use E").SetValue(true));
-            _Menu.SubMenu("Combo").AddItem(new MenuItem("UseIgnite", "Use Ignite if Killable").SetValue(true));
-            _Menu.SubMenu("Combo").AddItem(new MenuItem("UseR", "Use R").SetValue(false));
+            _Menu.SubMenu("Combo").AddItem(new MenuItem("UseR", "If killable use R/Ign").SetValue(false));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(_Menu.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             _Menu.AddSubMenu(new Menu("Potion Manager", "PotionManager"));
             _Menu.SubMenu("PotionManager").AddItem(new MenuItem("AutoPot", "Enable Auto-Pot").SetValue(true));
-            _Menu.SubMenu("PotionManager").AddItem(new MenuItem("AP_H", "Health Pot").SetValue(true));
-            _Menu.SubMenu("PotionManager").AddItem(new MenuItem("AP_M", "Mana Pot").SetValue(true));
-            _Menu.SubMenu("PotionManager").AddItem(new MenuItem("AP_H_Per", "Health Pot %").SetValue(new Slider(35, 1)));
-            _Menu.SubMenu("PotionManager").AddItem(new MenuItem("AP_M_Per", "Mana Pot %").SetValue(new Slider(35, 1)));
-            _Menu.SubMenu("PotionManager").AddItem(new MenuItem("AP_Ign", "Auto pot when ignited").SetValue(true));
 
             _Menu.AddSubMenu(new Menu("LaneClear", "LaneClear"));
             _Menu.SubMenu("LaneClear").AddItem(new MenuItem("UseQLaneClear", "Use Q").SetValue(true));
@@ -85,7 +84,7 @@ namespace StormImprover.Addons
 
             _Menu.AddSubMenu(new Menu("Misc Settings", "Misc"));
             _Menu.SubMenu("Misc").AddItem(new MenuItem("WGapCloser", "Auto W on Gapcloser").SetValue(true));
-            _Menu.SubMenu("Misc").AddItem(new MenuItem("eHarass", "Auto Harass w/ E").SetValue(true));
+            _Menu.SubMenu("Misc").AddItem(new MenuItem("eHarass", "Auto Harass w/ E").SetValue<KeyBind>(new KeyBind('T', KeyBindType.Toggle)));
             _Menu.SubMenu("Misc").AddItem(new MenuItem("Disrespecter", "Disrespect Mode").SetValue(false));
             _Menu.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Packets").SetValue(false));
 
@@ -122,13 +121,13 @@ namespace StormImprover.Addons
 
             if (_Menu.Item("uBilgewaterCutlass").GetValue<bool>() && target != null)
             {
-                if (BilgewaterCutlass.IsOwned(ObjectManager.Player) && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
+                if (BilgewaterCutlass.IsOwned() && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
                     BilgewaterCutlass.Cast(target);
             }
 
             if (_Menu.Item("uHexTech").GetValue<bool>() && target != null)
             {
-                if (HexTech.IsOwned(ObjectManager.Player) && HexTech.IsReady() && BilgewaterCutlass.IsInRange(target))
+                if (HexTech.IsOwned() && HexTech.IsReady() && BilgewaterCutlass.IsInRange(target))
                     HexTech.Cast(target);
             }
 
@@ -140,8 +139,38 @@ namespace StormImprover.Addons
 
             if (_Menu.Item("UseR").GetValue<bool>() && R.IsReady() && target.IsValidTarget(R.Range) && target != null)
             {
-                R.Cast(target);
-            }
+                if (target != null)
+                {
+                    if (target.Health + 30 > (ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) * 0.2))
+                    {
+                        R.Cast(target);
+                        ultImprover = true;
+
+                        Utility.DelayAction.Add(40000, () => ultImprover = false);
+
+                        var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+                        var targetHealth = target.Health;
+                        var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
+                        if (hasPots || target.HasBuff("RegenerationPotion", true))
+                        {
+                            if (damage * 0.5 > targetHealth)
+                            {
+                                if (IgniteSlot.IsReady())
+                                {
+                                    ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (IgniteSlot.IsReady() && damage > targetHealth)
+                            {
+                                ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
+                            }
+                        }
+                    }
+                }                                                     
+            }   
 
             if (_Menu.Item("UseE").GetValue<bool>() && E.IsReady() && target.IsValidTarget(E.Range) && target != null)
             {
@@ -150,20 +179,7 @@ namespace StormImprover.Addons
         }
 
         static void LaneClear()
-        {
-            var minionMelee = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range,
-                MinionTypes.Melee,
-                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
-
-            if (minionMelee.Count > 0)
-            {
-                var minions = minionMelee[0];
-                if (_Menu.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
-                {
-                    Q.Cast();
-                }               
-            }
-
+        {           
             var minionRanged = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
                 MinionTypes.Ranged,
                 MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
@@ -180,6 +196,22 @@ namespace StormImprover.Addons
 
         private static void AfterAttack(AttackableUnit unit, AttackableUnit mytarget)
         {            
+            if (_Menu.Item("LaneClearActive").GetValue<bool>())
+            {
+                var minionMelee = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range,
+                MinionTypes.Melee,
+                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
+
+                if (minionMelee.Count > 0)
+                {
+                    var minions = minionMelee[0];
+                    if (_Menu.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
+                    {
+                        Q.Cast();
+                    }
+                }
+            }
+
             if (_Menu.Item("ComboActive").GetValue<KeyBind>().Active)
             {
                 if (_Menu.Item("UseQ").GetValue<bool>() && Q.IsReady())
@@ -203,7 +235,7 @@ namespace StormImprover.Addons
                 LaneClear();
             if (_Menu.Item("AutoPot").GetValue<bool>())
                 AutoPot();
-            if (_Menu.Item("eHarass").GetValue<bool>())
+            if (_Menu.Item("eHarass").GetValue<KeyBind>().Active)
                 eHrass();
         }
 
@@ -216,76 +248,44 @@ namespace StormImprover.Addons
 
         private static void UseIgnite(Obj_AI_Hero unit)
         {
-            if (_Menu.Item("useIgnite").GetValue<bool>())
+            var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(unit, Damage.SummonerSpell.Ignite);
+            var targetHealth = unit.Health;
+            var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
+            if (hasPots || unit.HasBuff("RegenerationPotion", true))
             {
-                var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(unit, Damage.SummonerSpell.Ignite);
-                var targetHealth = unit.Health;
-                var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
-                if (hasPots || unit.HasBuff("RegenerationPotion", true))
+                if (damage * 0.5 > targetHealth)
                 {
-                    if (damage * 0.5 > targetHealth)
-                    {
-                        if (IgniteSlot.IsReady())
-                        {
-                            ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
-                        }
-                    }
-                }
-                else
-                {
-                    if (IgniteSlot.IsReady() && damage > targetHealth)
+                    if (IgniteSlot.IsReady())
                     {
                         ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
                     }
                 }
             }
-        }
-        private static void AutoPot()
-        {           
-            if (_Menu.Item("AutoPot").GetValue<bool>())
+            else
             {
-                if (ObjectManager.Player.HasBuff("summonerdot") || ObjectManager.Player.HasBuff("MordekaiserChildrenOfTheGrave"))
+                if (IgniteSlot.IsReady() && damage > targetHealth)
                 {
-                    if (!ObjectManager.Player.InFountain())
-                    {
-                        Items.Item Biscuit = new Items.Item(2010, 10);
-                        Items.Item HPpot = new Items.Item(2003, 10);
-                        Items.Item Flask = new Items.Item(2041, 10);
-
-                        if (Items.HasItem(Biscuit.Id) && Items.CanUseItem(Biscuit.Id) &&
-                            !ObjectManager.Player.HasBuff("ItemMiniRegenPotion"))
-                        {
-                            Biscuit.Cast(ObjectManager.Player);
-                        }
-                        else if (Items.HasItem(HPpot.Id) && Items.CanUseItem(HPpot.Id) &&
-                                 !ObjectManager.Player.HasBuff("RegenerationPotion") && !ObjectManager.Player.HasBuff("Health Potion"))
-                        {
-                            HPpot.Cast(ObjectManager.Player);
-                        }
-                        else if (Items.HasItem(Flask.Id) && Items.CanUseItem(Flask.Id) &&
-                                 !ObjectManager.Player.HasBuff("ItemCrystalFlask"))
-                        {
-                            Flask.Cast(ObjectManager.Player);
-                        }
-                    }
+                    ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, unit);
                 }
+            }
+        }
 
-                if (ObjectManager.Player.HasBuff("Recall") || ObjectManager.Player.InFountain() && ObjectManager.Player.InShop())
-                {
-                    return;
-                }
+        private static void AutoPot()
+        {
 
-                //Health Pots
-                if (ObjectManager.Player.Health / 100 <= _Menu.Item("AP_H_Per").GetValue<Slider>().Value &&
-                    !ObjectManager.Player.HasBuff("RegenerationPotion", true))
+            if (_Menu.Item("AutoPot").GetValue<bool>() && !ObjectManager.Player.InFountain() && !ObjectManager.Player.HasBuff("Recall"))
+            {
+                if (Potion.IsReady() && !ObjectManager.Player.HasBuff("RegenerationPotion", true))
                 {
-                    Items.UseItem(2003);
+                    if (ObjectManager.Player.CountEnemiesInRange(700) > 0 && ObjectManager.Player.Health + 200 < ObjectManager.Player.MaxHealth)
+                        Potion.Cast();
+                    else if (ObjectManager.Player.Health < ObjectManager.Player.MaxHealth * 0.6)
+                        Potion.Cast();
                 }
-                //Mana Pots
-                if (ObjectManager.Player.Mana / 100 <= _Menu.Item("AP_M_Per").GetValue<Slider>().Value &&
-                    !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
+                if (ManaPotion.IsReady() && !ObjectManager.Player.HasBuff("FlaskOfCrystalWater", true))
                 {
-                    Items.UseItem(2004);
+                    if (ObjectManager.Player.CountEnemiesInRange(1200) > 0 && ObjectManager.Player.Mana + 200 < ObjectManager.Player.MaxMana)
+                        ManaPotion.Cast();
                 }
             }
         }
