@@ -67,7 +67,6 @@ namespace StormImprover.Addons
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseQ", "Use Q").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseW", "Use W").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseE", "Use E").SetValue(true));
-            _Menu.SubMenu("Combo").AddItem(new MenuItem("UseR", "If killable use R/Ign").SetValue(false));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(_Menu.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             _Menu.AddSubMenu(new Menu("Potion Manager", "PotionManager"));
@@ -137,44 +136,12 @@ namespace StormImprover.Addons
                     Q.Cast();
             }
 
-            if (_Menu.Item("UseW").GetValue<bool>() && target != null)
+            if (_Menu.Item("UseW").GetValue<bool>())
             {
                 if (W.IsReady() && target.IsValidTarget(250f))
                     W.Cast(ObjectManager.Player); 
             }
-
-            if (_Menu.Item("UseR").GetValue<bool>() && R.IsReady() && target != null)
-            {
-                if (target != null)
-                {
-                    if (target.IsValidTarget(R.Range))
-                    {
-                        R.Cast(target, true);
-
-                        var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
-                        var targetHealth = target.Health;
-                        var hasPots = Items.HasItem(ItemData.Health_Potion.Id) || Items.HasItem(ItemData.Crystalline_Flask.Id);
-                        if (hasPots || target.HasBuff("RegenerationPotion", true))
-                        {
-                            if (damage * 0.5 > targetHealth)
-                            {
-                                if (IgniteSlot.IsReady())
-                                {
-                                    ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (IgniteSlot.IsReady() && damage > targetHealth)
-                            {
-                                ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
-                            }
-                        }
-                    }
-                }                                                     
-            }   
-
+             
             if (_Menu.Item("UseE").GetValue<bool>() && E.IsReady() && target.IsValidTarget(E.Range) && target != null)
             {
                 E.CastIfHitchanceEquals(target, HitChance.High, _Menu.Item("usePackets").GetValue<bool>());
