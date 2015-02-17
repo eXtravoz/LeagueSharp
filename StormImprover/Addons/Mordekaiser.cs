@@ -185,31 +185,22 @@ namespace StormImprover.Addons
         {
             if (_Menu.Item("LaneClearActive").GetValue<bool>())
             {
-                var minionMelee = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range,
-                MinionTypes.Melee,
+                var minionMelee = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
+                MinionTypes.All,
                 MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
 
-                if (minionMelee.Count > 0)
+                if (minionMelee.Count > 1)
                 {
                     var minions = minionMelee[0];
                     if (_Menu.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
                     {
                         Q.Cast();
                     }
-                }
-            }
-
-
-            var minionRanged = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
-                MinionTypes.Ranged,
-                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
-
-            if (minionRanged.Count > 2)
-            {
-                var minions = minionRanged[2];
-                if (_Menu.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
-                {
-                    E.Cast(minions);
+                    
+                    if (_Menu.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
+                    {
+                        E.Cast(minions);
+                    }
                 }
             }
         }
