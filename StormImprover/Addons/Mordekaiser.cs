@@ -89,6 +89,8 @@ namespace StormImprover.Addons
             _Menu.SubMenu("Misc").AddItem(new MenuItem("usePackets", "Packets").SetValue(false));
 
             _Menu.AddSubMenu(new Menu("Drawings", "Drawings"));
+            _Menu.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
+            _Menu.SubMenu("Drawings").AddItem(new MenuItem("WRange", "W Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             _Menu.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             _Menu.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             _Menu.AddToMainMenu();
