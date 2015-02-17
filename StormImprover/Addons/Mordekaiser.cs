@@ -1,4 +1,4 @@
-﻿#region
+#region
 
 using System;
 using System.Collections.Generic;
@@ -131,22 +131,25 @@ namespace StormImprover.Addons
                     HexTech.Cast(target);
             }
 
-            if (_Menu.Item("UseW").GetValue<bool>() && target != null)
+            if (_Menu.Item("UseQ").GetValue<bool>() && target != null)
             {
-                if (target.Distance(ObjectManager.Player.Position) <= 250 && W.IsReady())
-                    W.Cast(ObjectManager.Player);
+                if (target.Distance(ObjectManager.Player.Position) <= ObjectManager.Player.AttackRange && Q.IsReady() && target.IsValidTarget(ObjectManager.Player.AttackRange))
+                    Q.Cast();
             }
 
-            if (_Menu.Item("UseR").GetValue<bool>() && R.IsReady() && target.IsValidTarget(R.Range) && target != null)
+            if (_Menu.Item("UseW").GetValue<bool>() && target != null)
+            {
+                if (target.Distance(ObjectManager.Player.Position) <= ObjectManager.Player.AttackRange && W.IsReady() && target.IsValidTarget(ObjectManager.Player.AttackRange))
+                    W.Cast(ObjectManager.Player); 
+            }
+
+            if (_Menu.Item("UseR").GetValue<bool>() && R.IsReady() && target != null)
             {
                 if (target != null)
                 {
-                    if (target.Health + 30 > (ObjectManager.Player.GetSpellDamage(target, SpellSlot.R) * 0.2))
+                    if (target.IsValidTarget(R.Range))
                     {
-                        R.Cast(target);
-                        ultImprover = true;
-
-                        Utility.DelayAction.Add(40000, () => ultImprover = false);
+                        R.Cast(target, true);
 
                         var damage = IgniteSlot == SpellSlot.Unknown || ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready ? 0 : ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
                         var targetHealth = target.Health;
@@ -179,23 +182,7 @@ namespace StormImprover.Addons
         }
 
         static void LaneClear()
-        {           
-            var minionRanged = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
-                MinionTypes.Ranged,
-                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
-
-            if (minionRanged.Count > 2)
-            {
-                var minions = minionRanged[2];
-                if (_Menu.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
-                {
-                    E.Cast(minions);
-                }
-            }
-        }
-
-        private static void AfterAttack(AttackableUnit unit, AttackableUnit mytarget)
-        {            
+        {
             if (_Menu.Item("LaneClearActive").GetValue<bool>())
             {
                 var minionMelee = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range,
@@ -212,6 +199,23 @@ namespace StormImprover.Addons
                 }
             }
 
+
+            var minionRanged = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
+                MinionTypes.Ranged,
+                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
+
+            if (minionRanged.Count > 2)
+            {
+                var minions = minionRanged[2];
+                if (_Menu.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
+                {
+                    E.Cast(minions);
+                }
+            }
+        }
+
+        private static void AfterAttack(AttackableUnit unit, AttackableUnit mytarget)
+        {                       
             if (_Menu.Item("ComboActive").GetValue<KeyBind>().Active)
             {
                 if (_Menu.Item("UseQ").GetValue<bool>() && Q.IsReady())
