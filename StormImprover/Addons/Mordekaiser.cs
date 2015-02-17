@@ -33,7 +33,7 @@ namespace StormImprover.Addons
 
         public Mordekaiser()
         {
-            Game_OnGameLoad();            
+            Game_OnGameLoad();
         }
 
         private static void Game_OnGameLoad()
@@ -67,6 +67,7 @@ namespace StormImprover.Addons
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseQ", "Use Q").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseW", "Use W").SetValue(true));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("UseE", "Use E").SetValue(true));
+            _Menu.SubMenu("Combo").AddItem(new MenuItem("UseR", "If killable use R/Ign").SetValue(false));
             _Menu.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(_Menu.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             _Menu.AddSubMenu(new Menu("Potion Manager", "PotionManager"));
@@ -93,7 +94,7 @@ namespace StormImprover.Addons
             _Menu.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             _Menu.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             _Menu.AddToMainMenu();
-            
+
             Game.OnGameUpdate += OnGameUpdate;
             Drawing.OnDraw += OnDraw;
             Orbwalking.AfterAttack += AfterAttack;
@@ -109,7 +110,7 @@ namespace StormImprover.Addons
         {
 
             if (ObjectManager.Player.Health >= 10)
-                return; 
+                return;
 
             var target = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
             var BilgewaterCutlass = ItemData.Bilgewater_Cutlass.GetItem();
@@ -136,12 +137,12 @@ namespace StormImprover.Addons
                     Q.Cast();
             }
 
-            if (_Menu.Item("UseW").GetValue<bool>())
+            if (_Menu.Item("UseW").GetValue<bool>() && target != null)
             {
-                if (W.IsReady() && target.IsValidTarget(250f))
-                    W.Cast(ObjectManager.Player); 
-            }
-             
+                if (W.IsReady())
+                    W.Cast(ObjectManager.Player);
+            }           
+
             if (_Menu.Item("UseE").GetValue<bool>() && E.IsReady() && target.IsValidTarget(E.Range) && target != null)
             {
                 E.CastIfHitchanceEquals(target, HitChance.High, _Menu.Item("usePackets").GetValue<bool>());
@@ -182,7 +183,7 @@ namespace StormImprover.Addons
         }
 
         private static void AfterAttack(AttackableUnit unit, AttackableUnit mytarget)
-        {                       
+        {
             if (_Menu.Item("ComboActive").GetValue<KeyBind>().Active)
             {
                 if (_Menu.Item("UseQ").GetValue<bool>() && Q.IsReady())
@@ -288,10 +289,10 @@ namespace StormImprover.Addons
             var BilgewaterCutlass = ItemData.Bilgewater_Cutlass.GetItem();
             var HexTech = ItemData.Hextech_Revolver.GetItem();
 
-            if (HexTech.IsOwned(ObjectManager.Player) && HexTech.IsReady() && HexTech.IsInRange(target))
+            if (HexTech.IsOwned() && HexTech.IsReady() && HexTech.IsInRange(target))
                 dmg += ObjectManager.Player.GetItemDamage(target, Damage.DamageItems.Hexgun);
 
-            if (BilgewaterCutlass.IsOwned(ObjectManager.Player) && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
+            if (BilgewaterCutlass.IsOwned() && BilgewaterCutlass.IsReady() && BilgewaterCutlass.IsInRange(target))
                 dmg += ObjectManager.Player.GetItemDamage(target, Damage.DamageItems.Bilgewater);
 
             return (float)dmg;
