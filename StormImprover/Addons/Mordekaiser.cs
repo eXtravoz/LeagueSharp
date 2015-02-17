@@ -152,6 +152,25 @@ namespace StormImprover.Addons
         {
             if (_Menu.Item("LaneClearActive").GetValue<bool>())
             {
+                var minionRanged = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
+                MinionTypes.All,
+                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
+
+                if (minionRanged.Count > 2)
+                {
+                    var minions = minionRanged[2];
+                    if (_Menu.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
+                    {
+                        E.Cast(minions);
+                    }
+                }
+            }
+        }
+
+        private static void AfterAttack(AttackableUnit unit, AttackableUnit mytarget)
+        {
+            if (_Menu.Item("LaneClearActive").GetValue<bool>())
+            {
                 var minionMelee = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range,
                 MinionTypes.All,
                 MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
@@ -165,24 +184,7 @@ namespace StormImprover.Addons
                     }
                 }
             }
-
-
-            var minionRanged = MinionManager.GetMinions(ObjectManager.Player.Position, E.Range,
-                MinionTypes.All,
-                MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
-
-            if (minionRanged.Count > 2)
-            {
-                var minions = minionRanged[2];
-                if (_Menu.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
-                {
-                    E.Cast(minions);
-                }
-            }
-        }
-
-        private static void AfterAttack(AttackableUnit unit, AttackableUnit mytarget)
-        {
+            
             if (_Menu.Item("ComboActive").GetValue<KeyBind>().Active)
             {
                 if (_Menu.Item("UseQ").GetValue<bool>() && Q.IsReady())
