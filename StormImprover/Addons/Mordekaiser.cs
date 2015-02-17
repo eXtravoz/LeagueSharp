@@ -148,7 +148,7 @@ namespace StormImprover.Addons
             }
         }
 
-        static void LaneClear()
+        private static void LaneClear()
         {
             if (_Menu.Item("LaneClearActive").GetValue<bool>())
             {
