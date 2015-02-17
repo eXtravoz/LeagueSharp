@@ -133,13 +133,13 @@ namespace StormImprover.Addons
             if (_Menu.Item("UseQ").GetValue<bool>() && target != null)
             {
                 if (target.Distance(ObjectManager.Player.Position) <= ObjectManager.Player.AttackRange && Q.IsReady() && target.IsValidTarget(ObjectManager.Player.AttackRange))
-                    Q.Cast();
+                    Q.Cast(true);
             }
 
             if (_Menu.Item("UseW").GetValue<bool>() && target != null)
             {
                 if (W.IsReady())
-                    W.Cast(ObjectManager.Player);
+                    W.Cast(ObjectManager.Player, true);
             }           
 
             if (_Menu.Item("UseE").GetValue<bool>() && E.IsReady() && target.IsValidTarget(E.Range) && target != null)
@@ -159,7 +159,7 @@ namespace StormImprover.Addons
                 if (minionMelee.Count > 0)
                 {
                     var minions = minionMelee[0];
-                    if (_Menu.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
+                    if (_Menu.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady())
                     {
                         Q.Cast();
                     }
